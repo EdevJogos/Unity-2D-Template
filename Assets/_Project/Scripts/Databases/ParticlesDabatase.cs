@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ParticlesDabatase : MonoBehaviour
+public class ParticlesDabatase : MonoBehaviour, IDatabase
 {
     [System.Serializable]
     public struct ParticleData
@@ -13,7 +13,7 @@ public class ParticlesDabatase : MonoBehaviour
 
     public ParticleData[] particles;
 
-    private void Awake()
+    public void Initiate()
     {
         Instance = this;
     }

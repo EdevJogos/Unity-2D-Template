@@ -15,6 +15,8 @@ public class AudioManager : MonoBehaviour
         #endif
         public SFXOccurrence occurrence;
         public float volume = 1;
+        public float pitch = 1;
+        public Range randPitch;
         public AudioClip[] audioClip;
     }
 
@@ -41,7 +43,7 @@ public class AudioManager : MonoBehaviour
     public static SFXSource SFXSourcePrefab;
     public static Dictionary<SFXOccurrence, ClipData> SFXClips = new Dictionary<SFXOccurrence, ClipData>();
     public static Dictionary<Characters, ClipData[]> VoiceClips = new Dictionary<Characters, ClipData[]>();
-    private static List<AudioSource> SFXSources = new List<AudioSource>(10);
+    private static List<AudioSource> SFXSources = new List<AudioSource>(20);
 
     public void Initate()
     {
@@ -90,7 +92,7 @@ public class AudioManager : MonoBehaviour
         VoiceVol(PlayerPrefs.GetFloat("VoiceVol"));
     }
 
-    public static void PlaySFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pitch = 1, float p_pan = 0f)
+    public static void PlaySFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pan = 0f)
     {
         for (int __i = 0; __i < SFXSources.Count; __i++)
         {
@@ -98,21 +100,52 @@ public class AudioManager : MonoBehaviour
             {
                 ClipData __data = SFXClips[p_occurrence];
                 SFXSources[__i].outputAudioMixerGroup = Instance.sfxMixerGroup;
-                PlayClip(SFXSources[__i], __data.audioClip[p_index], __data.volume, p_pitch, p_pan);
+                PlayClip(SFXSources[__i], __data, p_index, p_pan);
 
                 break;
             }
         }
     }
 
-    public static void PlaySFX(SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0, float p_pitch = 1, float p_pan = 0f)
+    public static void PlaySFX(AudioSource p_source, ClipData p_data, int p_index = 0, float p_pan = 0f)
+    {
+        PlayClip(p_source, p_data, p_index, p_pan);
+    }
+
+    public static SFXSource PlayLoopSFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pan = 0f)
+    {
+        SFXSource __sfxSource = Instantiate(SFXSourcePrefab, Vector3.zero, Quaternion.identity);
+        AudioSource __audioSource = __sfxSource.GetComponent<AudioSource>();
+        ClipData __data = SFXClips[p_occurrence];
+
+        __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
+        __audioSource.loop = true;
+
+        PlayClip(__audioSource, __data, p_index, p_pan);
+
+        return __sfxSource;
+    }
+
+    public static SFXSource CreateSFXSource(SFXOccurrence p_occurrence, Transform p_parent, Vector2 p_position)
+    {
+        SFXSource __sfxSource = Instantiate(SFXSourcePrefab, p_position, Quaternion.identity, p_parent);
+        AudioSource __audioSource = __sfxSource.GetComponent<AudioSource>();
+        ClipData __data = SFXClips[p_occurrence];
+
+        __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
+        __sfxSource.SetClipData(__data);
+
+        return __sfxSource;
+    }
+
+    public static void PlaySFX(SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0, float p_pan = 0f)
     {
         ClipData __data = SFXClips[p_occurrence];
         p_source.outputAudioMixerGroup = Instance.sfxMixerGroup;
-        PlayClip(p_source, __data.audioClip[p_index], __data.volume, p_pitch, p_pan);
+        PlayClip(p_source, __data, p_index, p_pan);
     }
 
-    public static void PlaySFX(Characters p_character, SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0, float p_pitch = 1, float p_pan = 0f)
+    public static void PlaySFX(Characters p_character, SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0, float p_pan = 0f)
     {
         ClipData[] __clips = VoiceClips[p_character];
 
@@ -124,23 +157,22 @@ public class AudioManager : MonoBehaviour
             {
                 int __index = p_index < 0 ? Random.Range(0, __data.audioClip.Length + (p_index + 1)) : p_index;
                 p_source.outputAudioMixerGroup = Instance.voiceMixerGroup;
-                PlayClip(p_source, __data.audioClip[__index], __data.volume, p_pitch, p_pan);
+                PlayClip(p_source, __data, __index, p_pan);
 
                 break;
             }
         }
     }
 
-    public static void PlaySFX(SFXOccurrence p_occurrence, Vector2 p_position, int p_index = 0, float p_pitch = 1, float p_pan = 0f)
+    public static void PlaySFX(SFXOccurrence p_occurrence, Vector2 p_position, int p_index = 0, float p_pan = 0f)
     {
         SFXSource __sfxSource = Instantiate(SFXSourcePrefab, p_position, Quaternion.identity);
         AudioSource __audioSource = __sfxSource.GetComponent<AudioSource>();
         ClipData __data = SFXClips[p_occurrence];
 
         __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
-        __audioSource.clip = __data.audioClip[p_index];
-        __audioSource.volume = __data.volume;
-        __audioSource.Play();
+
+        PlayClip(__audioSource, __data, p_index, p_pan);
 
         __sfxSource.enabled = true;
     }
@@ -158,7 +190,14 @@ public class AudioManager : MonoBehaviour
         Instance.StartCoroutine(RoutineStopSFX(p_source, p_time));
     }
 
-    private static void PlayClip(AudioSource p_source, AudioClip p_clip, float p_volume, float p_pitch = 1, float p_pan = 0f)
+    private static void PlayClip(AudioSource p_source, ClipData p_data, int p_clipIndex, float p_pan)
+    {
+        float __pitch = p_data.pitch + p_data.randPitch.Value;
+
+        PlayClip(p_source, p_data.audioClip[p_clipIndex], p_data.volume, __pitch, p_pan);
+    }
+
+    private static void PlayClip(AudioSource p_source, AudioClip p_clip, float p_volume, float p_pitch, float p_pan)
     {
         p_source.clip = p_clip;
         p_source.pitch = p_pitch;

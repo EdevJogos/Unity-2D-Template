@@ -32,6 +32,7 @@ public class EditorVariableData
 /// Variables that are used outside of the target instance scope.
 /// Ex.: HealthPoints needs to be accessed by the Player and HUD, but HUD must not depend on the Player existing to be tested.
 /// </summary>
+//Needs to being used so it shows up in the UIToolkit Window menu.
 public static class VariablesDatabase
 {
     public class PlayerData
@@ -44,12 +45,14 @@ public static class VariablesDatabase
 
         public PlayerData(int p_id)
         {
+            Debug.Log("PlayerData " + p_id);
             #if UNITY_EDITOR
             EditorVariableData __editorData = new EditorVariableData();
 
             __editorData.label = "Player " + p_id;
             __editorData.trackedFloats.Add(new EditorVariable<float>("HealthPoints", HealthPoints));
             __editorData.trackedFloats.Add(new EditorVariable<float>("ManaPoints", ManaPoints));
+            Debug.Log("Construct Player Data");
             #endif
         }
     }

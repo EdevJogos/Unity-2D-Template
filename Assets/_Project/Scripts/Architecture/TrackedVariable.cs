@@ -31,7 +31,7 @@ public class TrackedVariable<T>
         _value = p_value;
     }
 
-    public void Register(System.Action<T> p_action, int p_order)
+    public void Register(System.Action<T> p_action, int p_priority = 0)
     {
         _registeredActions.Add(p_action);
     }

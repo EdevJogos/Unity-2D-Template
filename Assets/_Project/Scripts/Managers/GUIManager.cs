@@ -1,20 +1,27 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class GUIManager : MonoBehaviour
 {
-    public Canvas mainCanvas;
-    public Display[] displays;
+    public Transform displaysHolder;
 
-    [SerializeField] private Display _activeDisplay;
+    private Display _activeDisplay;
+    private Dictionary<Displays, Display> _displays = new Dictionary<Displays, Display>();
 
     public void Initiate()
     {
         Display.onActionRequested += OnActionRequested;
 
-        for (int __i = 0; __i < displays.Length; __i++)
+        foreach (Transform __transform in displaysHolder)
         {
-            displays[__i].Initiate();
+            Display __display = __transform.GetComponent<Display>();
+
+            if (__display == null)
+                return;
+
+            __display.Initiate();
+            _displays.Add(__display.ID, __display);
         }
     }
 
@@ -25,9 +32,9 @@ public class GUIManager : MonoBehaviour
 
     public void Initialize()
     {
-        for (int __i = 0; __i < displays.Length; __i++)
+        foreach (Display __display in _displays.Values)
         {
-            displays[__i].Initialize();
+            __display.Initialize();
         }
     }
 
@@ -48,7 +55,7 @@ public class GUIManager : MonoBehaviour
 
     private void ActiveDisplay(Displays p_display, Action p_onShowCompleted, float p_showRatio)
     {
-        _activeDisplay = displays[(byte)p_display];
+        _activeDisplay = _displays[p_display];
         _activeDisplay.Show(true, p_onShowCompleted, p_showRatio);
     }
 
@@ -56,29 +63,29 @@ public class GUIManager : MonoBehaviour
 
     public void UpdateDisplay(Displays p_id, int p_operation, bool p_value)
     {
-        displays[(int)p_id].UpdateDisplay(p_operation, p_value);
+        _displays[p_id].UpdateDisplay(p_operation, p_value);
     }
 
     public void UpdateDisplay(Displays p_id, int p_operation, float p_value = -99999, float p_data = -99999)
     {
-        displays[(int)p_id].UpdateDisplay(p_operation, p_value, p_data);
+        _displays[p_id].UpdateDisplay(p_operation, p_value, p_data);
     }
 
     public void UpdateDisplay(Displays p_id, int p_operation, int[] p_data)
     {
-        displays[(int)p_id].UpdateDisplay(p_operation, p_data);
+        _displays[p_id].UpdateDisplay(p_operation, p_data);
     }
 
     public void UpdateDisplay(Displays p_id, int p_operation, object p_data)
     {
-        displays[(int)p_id].UpdateDisplay(p_operation, p_data);
+        _displays[p_id].UpdateDisplay(p_operation, p_data);
     }
 
     #endregion
 
     public object GetData(Displays p_id, int p_data)
     {
-        return displays[(int)p_id].GetData(p_data);
+        return _displays[p_id].GetData(p_data);
     }
 
     private void OnActionRequested(Displays p_id, int p_action)

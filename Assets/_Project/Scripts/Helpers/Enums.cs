@@ -3,11 +3,11 @@
     NONE,
     LOADING,
     INTRO,
+    STARTING,
     PLAY,
     PAUSE,
     GAME_OVER,
     VICTORY,
-    STARTING,
 }
 
 public enum DisplayTypes
@@ -32,8 +32,11 @@ public enum Displays
 
 public enum SFXOccurrence
 {
-    BUTTON_SELECTED,
+    //GAME
+    //UI
+    BUTTON_SELECTED = 150,
     BUTTON_PRESSED,
+    NONE = 254
 }
 
 public enum Particles

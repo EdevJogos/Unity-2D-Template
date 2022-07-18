@@ -14,13 +14,13 @@ public class TimerManager : MonoBehaviour
         public float endTime;
         private float _duration;
 
-        public Timer(bool run, bool permenant, bool loop, float duration, Action onCompleted)
+        public Timer(float duration, Action p_onCompleted, bool p_run = true, bool p_permenant = false, bool p_loop = false)
         {
-            this.run = run;
-            this.permenant = permenant;
-            this.loop = loop;
+            run = p_run;
+            permenant = p_permenant;
+            loop = p_loop;
             _duration = duration;
-            this.onCompleted = onCompleted;
+            onCompleted = p_onCompleted;
         }
 
         public virtual float GetDuration()
@@ -50,7 +50,7 @@ public class TimerManager : MonoBehaviour
     {
         public Range range;
 
-        public RandomTimer(Range range, bool run, bool permenant, bool loop, float duration, Action onCompleted) : base(run, permenant, loop, duration, onCompleted)
+        public RandomTimer(Range range, bool run, bool permenant, bool loop, float duration, Action onCompleted) : base(duration, onCompleted, run, permenant, loop)
         {
             this.range = range;
         }
@@ -78,6 +78,9 @@ public class TimerManager : MonoBehaviour
 
     private void Update()
     {
+        if (GameCEO.State != GameState.PLAY)
+            return;
+
         PlayTime += Time.deltaTime;
 
         for (int __i = 0; __i < PlayTimers.Count; __i++)

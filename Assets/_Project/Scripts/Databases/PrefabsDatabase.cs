@@ -1,21 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PrefabsDatabase : MonoBehaviour
+public class PrefabsDatabase : MonoBehaviour, IDatabase
 {
     [System.Serializable]
     public struct PrefabData
     {
         public Prefabs ID;
-        public GameObject[] particles;
+        public GameObject[] prefabs;
     }
 
     public static PrefabsDatabase Instance;
 
     public PrefabData[] prefabs;
 
-    private void Awake()
+    public void Initiate()
     {
         Instance = this;
     }
@@ -45,7 +43,7 @@ public class PrefabsDatabase : MonoBehaviour
         {
             if (Instance.prefabs[__i].ID == p_id)
             {
-                return Instance.prefabs[__i].particles[p_index];
+                return Instance.prefabs[__i].prefabs[p_index];
             }
         }
 

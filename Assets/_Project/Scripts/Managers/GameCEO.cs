@@ -22,8 +22,6 @@ public class GameCEO : MonoBehaviour
     public AgentsManager agentsManager;
     public StageManager stageManager;
 
-    public ParticlesDabatase particlesDabatase;
-
     private void Awake()
     {
         if(Instance != null)
