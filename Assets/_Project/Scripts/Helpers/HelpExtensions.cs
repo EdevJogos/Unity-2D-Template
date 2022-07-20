@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public  static class HelpExtensions
+public static class HelpExtensions
 {
     public static List<string> IntStringLookup = new List<string>(290);
 
@@ -39,6 +39,11 @@ public  static class HelpExtensions
         return p_value <= 0 ? 0 : p_value;
     }
 
+    public static float ClampMin(float p_value, float p_min)
+    {
+        return p_value < p_min ? p_min : p_value;
+    }
+
     public static int ClampMax(int p_value, int p_max)
     {
         return p_value > p_max ? p_max : p_value;
@@ -49,32 +54,52 @@ public  static class HelpExtensions
         return p_value > p_max ? p_max : p_value;
     }
 
-    public static void SetX(this Vector2 p_vector, int p_x)
+    public static void SetX(this ref Vector2 p_vector, int p_x)
     {
         p_vector.Set(p_x, p_vector.y);
     }
 
-    public static void SetY(this Vector2 p_vector, int p_y)
+    public static void SetX(this ref Vector2 p_vector, float p_x)
+    {
+        p_vector.Set(p_x, p_vector.y);
+    }
+
+    public static void SetY(this ref Vector2 p_vector, int p_y)
     {
         p_vector.Set(p_vector.x, p_y);
     }
 
-    public static void AddX(this Vector2 p_vector, int p_amount)
+    public static void SetY(this ref Vector2 p_vector, float p_y)
+    {
+        p_vector.Set(p_vector.x, p_y);
+    }
+
+    public static void AddX(this ref Vector2 p_vector, int p_amount)
     {
         p_vector.Set(p_vector.x + p_amount, p_vector.y);
     }
 
-    public static void AddY(this Vector2 p_vector, int p_amount)
+    public static void AddX(this ref Vector2 p_vector, float p_amount)
+    {
+        p_vector.Set(p_vector.x + p_amount, p_vector.y);
+    }
+
+    public static void AddY(this ref Vector2 p_vector, int p_amount)
     {
         p_vector.Set(p_vector.x, p_vector.y + p_amount);
     }
 
-    public static void MultiplyX(this Vector2 p_vector, int p_amount)
+    public static void AddY(this ref Vector2 p_vector, float p_amount)
+    {
+        p_vector.Set(p_vector.x, p_vector.y + p_amount);
+    }
+
+    public static void MultiplyX(this ref Vector2 p_vector, int p_amount)
     {
         p_vector.Set(p_vector.x * p_amount, p_vector.y);
     }
 
-    public static void MultiplyY(this Vector2 p_vector, int p_amount)
+    public static void MultiplyY(this ref Vector2 p_vector, int p_amount)
     {
         p_vector.Set(p_vector.x, p_vector.y * p_amount);
     }
@@ -111,7 +136,7 @@ public  static class HelpExtensions
 
     public static int RandomSelect(int p_value1, int p_value2)
     {
-        return Random.Range(0, 2) == 1 ? p_value1 : p_value2; 
+        return Random.Range(0, 2) == 1 ? p_value1 : p_value2;
     }
 
     public static T RandomSelect<T>(T p_value1, T p_value2)
@@ -131,6 +156,11 @@ public  static class HelpExtensions
     public static bool LuckyDraw(int p_percentage)
     {
         return Random.Range(1, 101) <= p_percentage;
+    }
+
+    public static bool Contains(this LayerMask p_mask, int p_layer)
+    {
+        return (p_mask & (1 << p_layer)) != 0;
     }
 
     public static float GetStereoPan(float p_x)
