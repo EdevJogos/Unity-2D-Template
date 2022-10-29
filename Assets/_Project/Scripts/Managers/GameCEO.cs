@@ -43,15 +43,12 @@ public class GameCEO : MonoBehaviour
 
     private void Initiate()
     {
-        cameraManager.Initiate();
-        audioManager.Initate();
-        guiManager.Initiate();
+
     }
 
     public void Initialize()
     {
-        audioManager.Initialize();
-        guiManager.Initialize();
+
     }
 
     //-----------------CEO------------------

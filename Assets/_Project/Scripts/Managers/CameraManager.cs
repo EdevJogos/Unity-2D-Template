@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : Manager
 {
     public static Range VerticalLimit;
     public static Range HorizontalLimit;
@@ -12,9 +12,19 @@ public class CameraManager : MonoBehaviour
 
     public static Camera MainCamera;
 
-    public void Initiate()
+    public override void Initiate()
     {
         SetMainCamera();
+    }
+
+    public override void Initialize()
+    {
+        
+    }
+
+    public override void Renew()
+    {
+        
     }
 
     private void Update()
