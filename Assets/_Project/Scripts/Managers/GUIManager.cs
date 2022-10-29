@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 
-public class GUIManager : MonoBehaviour
+public class GUIManager : Manager
 {
     public Transform displaysHolder;
 
     private Display _activeDisplay;
     private Dictionary<Displays, Display> _displays = new Dictionary<Displays, Display>();
 
-    public void Initiate()
+    public override void Initiate()
     {
         Display.onActionRequested += OnActionRequested;
 
@@ -30,12 +30,17 @@ public class GUIManager : MonoBehaviour
         Display.onActionRequested -= OnActionRequested;
     }
 
-    public void Initialize()
+    public override void Initialize()
     {
         foreach (Display __display in _displays.Values)
         {
             __display.Initialize();
         }
+    }
+
+    public override void Renew()
+    {
+        
     }
 
     public void ShowDisplay(Displays p_display, Action p_onShowCompleted = null, float p_hideRatio = 1f, float p_showRatio = 1f)

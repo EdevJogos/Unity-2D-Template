@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class AudioManager : MonoBehaviour
+public class AudioManager : Manager
 {
     private static AudioManager Instance;
 
@@ -45,13 +45,13 @@ public class AudioManager : MonoBehaviour
     public static Dictionary<Characters, ClipData[]> VoiceClips = new Dictionary<Characters, ClipData[]>();
     private static List<AudioSource> SFXSources = new List<AudioSource>(20);
 
-    public void Initate()
+    public override void Initiate()
     {
         Instance = this;
         SFXSourcePrefab = sfxSourcePrefab;
     }
 
-    public void Initialize()
+    public override void Initialize()
     {
         for (int __i = 0; __i < sfxClips.Length; __i++)
         {
@@ -92,6 +92,11 @@ public class AudioManager : MonoBehaviour
         VoiceVol(PlayerPrefs.GetFloat("VoiceVol"));
     }
 
+    public override void Renew()
+    {
+        
+    }
+
     public static void PlaySFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pan = 0f)
     {
         for (int __i = 0; __i < SFXSources.Count; __i++)
@@ -120,6 +125,7 @@ public class AudioManager : MonoBehaviour
 
         __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
         __audioSource.loop = true;
+        __sfxSource.SetClipData(__data, true);
 
         PlayClip(__audioSource, __data, p_index, p_pan);
 
@@ -133,7 +139,7 @@ public class AudioManager : MonoBehaviour
         ClipData __data = SFXClips[p_occurrence];
 
         __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
-        __sfxSource.SetClipData(__data);
+        __sfxSource.SetClipData(__data, true);
 
         return __sfxSource;
     }
