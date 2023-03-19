@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class GUIManager : Manager
 {
+    public event Action<InputDevice> onJoinRequested;
+
     public Transform displaysHolder;
 
     private Display _activeDisplay;

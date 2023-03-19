@@ -224,6 +224,24 @@ public class AudioManager : Manager
         p_source.Stop();
     }
 
+    /// <summary>
+    /// Channels: 0 Master, 1 Music, 2 SFX
+    /// </summary>
+    public static void SetVolume(int p_channel, float p_value)
+    {
+        switch (p_channel)
+        {
+            case 0:
+                Instance.MasterVol(p_value);
+                break;
+            case 1:
+                Instance.MusicVol(p_value);
+                break;
+            case 2:
+                Instance.SFXVol(p_value);
+                break;
+        }
+    }
     public void MasterVol(float p_value)
     {
         audioMixer.SetFloat("MasterVol", Mathf.Log10(p_value) * 20f);

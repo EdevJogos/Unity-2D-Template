@@ -17,6 +17,12 @@ public enum DisplayTypes
     POP_UP,
 }
 
+public enum InputMaps
+{
+    UI,
+    PLAYER,
+}
+
 public enum Displays
 {
     HUD,

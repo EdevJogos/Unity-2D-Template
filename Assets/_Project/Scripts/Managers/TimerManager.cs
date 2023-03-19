@@ -1,21 +1,36 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TimerManager : Manager
 {
-    public override void Initialize()
-    {
-        throw new NotImplementedException();
-    }
+    public static TimerManager Instance;
 
     public override void Initiate()
     {
-        throw new NotImplementedException();
+        Instance = this;
+    }
+
+    public override void Initialize()
+    {
+        
     }
 
     public override void Renew()
     {
-        throw new NotImplementedException();
+        
+    }
+
+    public static void PlayCoroutine(bool p_play, IEnumerator p_routine)
+    {
+        if(p_play)
+        {
+            Instance.StartCoroutine(p_routine);
+        }
+        else
+        {
+            Instance.StopCoroutine(p_routine);
+        }
     }
 }

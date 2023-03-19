@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameCEO : MonoBehaviour
+public partial class GameCEO : MonoBehaviour
 {
     private static GameCEO Instance;
 
@@ -13,7 +13,9 @@ public class GameCEO : MonoBehaviour
 
     #if UNITY_EDITOR
     public GameState state;
-    #endif
+#endif
+
+    public Transform managersHolder;
 
     public GUIManager guiManager;
     public InputManager inputManager;
@@ -43,12 +45,28 @@ public class GameCEO : MonoBehaviour
 
     private void Initiate()
     {
+        foreach(Transform __transform in managersHolder)
+        {
+            if(__transform.TryGetComponent(out Manager __manager))
+            {
+                __manager.Initiate();
+            }
+        }
 
+        guiManager.onJoinRequested += GUIManager_onJoinRequested;
     }
 
     public void Initialize()
     {
+        foreach (Transform __transform in managersHolder)
+        {
+            if (__transform.TryGetComponent(out Manager __manager))
+            {
+                __manager.Initialize();
+            }
+        }
 
+        guiManager.ShowDisplay(Displays.SETTINGS);
     }
 
     //-----------------CEO------------------
