@@ -40,6 +40,8 @@ public class SettingsDisplay : Display
             {
                 _options[__i].UpdateCurrentValues();
             }
+
+            selection.GetComponent<Image>().enabled = true;
         }
         else
         {
@@ -49,17 +51,28 @@ public class SettingsDisplay : Display
         base.Show(p_show, p_callback, p_ratio);
     }
 
+    public void ApplySettings()
+    {
+        Debug.Log("ApplySettings");
+        for (int __i = 0; __i < _options.Count; __i++)
+        {
+            _options[__i].Apply();
+        }
+    }
+
+    protected override void SelectOption(UIOption p_option)
+    {
+        base.SelectOption(p_option);
+        selection.GetComponent<Image>().enabled = p_option is SettingOption;
+    }
+
     protected override void HandleHorizontalMovementActive(int p_dir) => SelectedOption.UpdateOptionActive(p_dir);
     protected override void HandleHorizontalMovementDelayed(int p_dir) => SelectedOption.UpdateOptionActiveDelayed(p_dir);
     protected override void HandleVerticalMovementActive(int p_dir) { }
 
     protected override void UI_onConfirmRequested(int p_id)
     {
-        Debug.Log("Confirm");
-        for (int __i = 0; __i < _options.Count; __i++)
-        {
-            _options[__i].Apply();
-        }
+
     }
 
     protected override void UI_InputHandler_onCancelRequested(int p_id)

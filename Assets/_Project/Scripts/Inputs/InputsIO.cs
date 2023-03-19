@@ -439,6 +439,17 @@ public partial class @InputsIO : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""f3f1ef59-0bf2-4c3b-aa2f-fd8181990482"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""fad4a676-fe3c-48dc-b7a7-d8e599ac662e"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",

@@ -103,7 +103,16 @@ public class GUIManager : Manager
             case Displays.INTRO:
                 switch (p_action)
                 {
+                    case 2:
+                        ShowDisplay(Displays.SETTINGS);
+                        break;
+                }
+                break;
+            case Displays.SETTINGS:
+                switch (p_action)
+                {
                     case 0:
+                        ShowDisplay(Displays.INTRO);
                         break;
                 }
                 break;

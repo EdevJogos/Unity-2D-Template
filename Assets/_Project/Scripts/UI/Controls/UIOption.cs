@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public class UIOption : Selectable
+public class UIOption : Selectable, ISubmitHandler
 {
     [SerializeField] private UnityEvent _onPointerUp;
 
@@ -11,6 +11,7 @@ public class UIOption : Selectable
 
     public override void OnSelect(BaseEventData eventData)
     {
+        base.OnSelect(eventData);
         onSelected?.Invoke();
     }
 
@@ -23,6 +24,11 @@ public class UIOption : Selectable
     public override void OnPointerUp(PointerEventData eventData)
     {
         base.OnPointerUp(eventData);
+        _onPointerUp?.Invoke();
+    }
+
+    public void OnSubmit(BaseEventData eventData)
+    {
         _onPointerUp?.Invoke();
     }
 }

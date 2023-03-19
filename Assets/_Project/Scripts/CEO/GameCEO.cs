@@ -15,14 +15,14 @@ public partial class GameCEO : MonoBehaviour
     public GameState state;
 #endif
 
-    public Transform managersHolder;
+    [SerializeField] private Transform _managersHolder;
 
-    public GUIManager guiManager;
-    public InputManager inputManager;
-    public CameraManager cameraManager;
-    public AudioManager audioManager;
-    public AgentsManager agentsManager;
-    public StageManager stageManager;
+    private GUIManager _guiManager;
+    private InputManager _inputManager;
+    private CameraManager _cameraManager;
+    private AudioManager _audioManager;
+    private AgentsManager _agentsManager;
+    private StageManager _stageManager;
 
     private void Awake()
     {
@@ -45,7 +45,14 @@ public partial class GameCEO : MonoBehaviour
 
     private void Initiate()
     {
-        foreach(Transform __transform in managersHolder)
+        _guiManager = _managersHolder.GetComponentInChildren<GUIManager>();
+        _inputManager = _managersHolder.GetComponentInChildren<InputManager>();
+        _cameraManager = _managersHolder.GetComponentInChildren<CameraManager>();
+        _audioManager = _managersHolder.GetComponentInChildren<AudioManager>();
+        _agentsManager = _managersHolder.GetComponentInChildren<AgentsManager>();
+        _stageManager = _managersHolder.GetComponentInChildren<StageManager>();
+
+        foreach (Transform __transform in _managersHolder)
         {
             if(__transform.TryGetComponent(out Manager __manager))
             {
@@ -53,12 +60,12 @@ public partial class GameCEO : MonoBehaviour
             }
         }
 
-        guiManager.onJoinRequested += GUIManager_onJoinRequested;
+        _guiManager.onJoinRequested += GUIManager_onJoinRequested;
     }
 
     public void Initialize()
     {
-        foreach (Transform __transform in managersHolder)
+        foreach (Transform __transform in _managersHolder)
         {
             if (__transform.TryGetComponent(out Manager __manager))
             {
@@ -66,7 +73,7 @@ public partial class GameCEO : MonoBehaviour
             }
         }
 
-        guiManager.ShowDisplay(Displays.SETTINGS);
+        _guiManager.ShowDisplay(Displays.INTRO);
     }
 
     //-----------------CEO------------------

@@ -63,7 +63,7 @@ public class UIInputs : InputHandler
             if (_moveDelay <= 0f)
             {
                 onWhileMovementActiveDelayed?.Invoke(InputManager.GetInputID(_listener), _moveInput);
-                _moveDelay = 0.5f;
+                _moveDelay = 0.25f;
             }
 
             onWhileMovementActive?.Invoke(InputManager.GetInputID(_listener), _moveInput);
@@ -85,5 +85,5 @@ public class UIInputs : InputHandler
     }
 
     public void ConfirmPerformed(InputAction.CallbackContext p_context) => onConfirmRequested?.Invoke(InputManager.GetInputID(_listener));
-    public void CancelPerformed(InputAction.CallbackContext p_context) => onConfirmRequested?.Invoke(InputManager.GetInputID(_listener));
+    public void CancelPerformed(InputAction.CallbackContext p_context) => onCancelRequested?.Invoke(InputManager.GetInputID(_listener));
 }
