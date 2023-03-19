@@ -57,7 +57,6 @@ public class SettingsDisplay : Display
 
     public void ApplySettings()
     {
-        Debug.Log("ApplySettings");
         for (int __i = 0; __i < _options.Count; __i++)
         {
             _options[__i].Apply();
@@ -73,14 +72,5 @@ public class SettingsDisplay : Display
     protected override void HandleHorizontalMovementActive(int p_dir) => SelectedOption.UpdateOptionActive(p_dir);
     protected override void HandleHorizontalMovementDelayed(int p_dir) => SelectedOption.UpdateOptionActiveDelayed(p_dir);
     protected override void HandleVerticalMovementActive(int p_dir) { }
-
-    protected override void UI_onConfirmRequested(int p_id)
-    {
-
-    }
-
-    protected override void UI_InputHandler_onCancelRequested(int p_id)
-    {
-        RequestAction(BACK);
-    }
+    protected override void UI_InputHandler_onCancelRequested(int p_id) => RequestAction(BACK);
 }

@@ -5,18 +5,31 @@ using UnityEngine.InputSystem;
 
 public class GUIManager : Manager
 {
-    public event Action<InputDevice> onJoinRequested;
+    public struct DisplayAction
+    {
+        public int actionID;
+        public Action<object> action;
 
-    public Transform displaysHolder;
+        public DisplayAction(int p_id, Action<object> p_action)
+        {
+            actionID = p_id;
+            action = p_action;
+        }
+    }
+
+    public event Action<object> onJoinRequested;
+
+    [SerializeField] private Transform _displaysHolder;
 
     private Display _activeDisplay;
     private Dictionary<Displays, Display> _displays = new Dictionary<Displays, Display>();
+    private Dictionary<Displays, List<DisplayAction>> _displayActions = new Dictionary<Displays, List<DisplayAction>>();
 
     public override void Initiate()
     {
         Display.onActionRequested += OnActionRequested;
 
-        foreach (Transform __transform in displaysHolder)
+        foreach (Transform __transform in _displaysHolder)
         {
             Display __display = __transform.GetComponent<Display>();
 
@@ -25,7 +38,16 @@ public class GUIManager : Manager
 
             __display.Initiate();
             _displays.Add(__display.ID, __display);
+            _displayActions.Add(__display.ID, new List<DisplayAction>());
         }
+
+        _displayActions[Displays.INTRO].Add(new DisplayAction(1, (p_data) => { ShowDisplay(Displays.LOBBY); }));
+        _displayActions[Displays.INTRO].Add(new DisplayAction(2, (p_data) => { ShowDisplay(Displays.SETTINGS); }));
+
+        _displayActions[Displays.SETTINGS].Add(new DisplayAction(0, (p_data) => { ShowDisplay(Displays.INTRO); }));
+
+        _displayActions[Displays.LOBBY].Add(new DisplayAction(0, (p_data) => { ShowDisplay(Displays.INTRO); }));
+        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.JOIN, onJoinRequested));
     }
 
     private void OnDestroy()
@@ -96,26 +118,14 @@ public class GUIManager : Manager
         return _displays[p_id].GetData(p_data);
     }
 
-    private void OnActionRequested(Displays p_id, int p_action)
+    private void OnActionRequested(Displays p_id, int p_actionID, object p_data)
     {
-        switch (p_id)
+        List<DisplayAction> __actionsList = _displayActions[p_id];
+        int __index = __actionsList.FindIndex(0, __actionsList.Count, (displayAction) => displayAction.actionID == p_actionID);
+
+        if(__index >= 0)
         {
-            case Displays.INTRO:
-                switch (p_action)
-                {
-                    case 2:
-                        ShowDisplay(Displays.SETTINGS);
-                        break;
-                }
-                break;
-            case Displays.SETTINGS:
-                switch (p_action)
-                {
-                    case 0:
-                        ShowDisplay(Displays.INTRO);
-                        break;
-                }
-                break;
+            __actionsList[__index].action?.Invoke(p_data);
         }
     }
 }

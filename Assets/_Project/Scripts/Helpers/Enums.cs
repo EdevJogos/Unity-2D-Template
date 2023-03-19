@@ -34,6 +34,7 @@ public enum Displays
     CREDITS,
     SETTINGS,
     TUTORIAL,
+    LOBBY,
 }
 
 public enum SFXOccurrence

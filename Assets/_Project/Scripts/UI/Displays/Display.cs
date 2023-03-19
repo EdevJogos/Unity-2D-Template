@@ -10,8 +10,7 @@ public class Display : MonoBehaviour
         TWEEN,
     }
 
-    public static System.Action<Displays, int> onActionRequested;
-    public static System.Action<Displays, int, object> onDataActionRequested;
+    public static System.Action<Displays, int, object> onActionRequested;
 
     public Displays ID => id;
 
@@ -216,6 +215,6 @@ public class Display : MonoBehaviour
 
     public virtual object GetData(int p_data) { return null; }
 
-    public virtual void RequestAction(int p_action) => onActionRequested?.Invoke(ID, p_action);
-    public virtual void RequestAction(int p_action, object p_data) => onDataActionRequested?.Invoke(ID, p_action, p_data);
+    public virtual void RequestAction(int p_action) => RequestAction(p_action, null);
+    public virtual void RequestAction(int p_action, object p_data) => onActionRequested?.Invoke(ID, p_action, p_data);
 }
