@@ -197,18 +197,13 @@ public class Display : MonoBehaviour
     protected virtual void HandleHorizontalMovementDelayed(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
     protected virtual void HandleVerticalMovementActive(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
     protected virtual void HandleVerticalMovementDelayed(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
-    protected virtual void SelectOption(UIOption p_option)
+    public virtual void SelectOption(UIOption p_option)
     {
         if (p_option == null)
             return;
 
-        SetCurSelected(p_option);
-        _curSelected.Select();
-        
-    }
-    protected virtual void SetCurSelected(UIOption p_option)
-    {
         _curSelected = p_option;
+        _curSelected.Select();
     }
     #endregion
 

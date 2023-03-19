@@ -9,6 +9,20 @@ public class UIOption : Selectable, ISubmitHandler
 
     public event System.Action onSelected;
 
+    [SerializeField] private Display m_display;
+
+    private Display Display
+    {
+        get
+        {
+            if(m_display == null)
+            {
+                m_display = GetComponentInParent<Display>();
+            }
+            return m_display;
+        }
+    }
+
     public override void OnSelect(BaseEventData eventData)
     {
         base.OnSelect(eventData);
@@ -18,7 +32,7 @@ public class UIOption : Selectable, ISubmitHandler
     public override void OnPointerEnter(PointerEventData eventData)
     {
         base.OnPointerEnter(eventData);
-        Select();
+        Display.SelectOption(this);
     }
 
     public override void OnPointerUp(PointerEventData eventData)

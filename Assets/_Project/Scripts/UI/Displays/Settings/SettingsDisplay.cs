@@ -20,7 +20,11 @@ public class SettingsDisplay : Display
         {
             if (__transform.TryGetComponent(out SettingOption __settingOption))
             {
-                __settingOption.onSelected += () => { selection.position = __settingOption.Position; SetCurSelected(__settingOption); };
+                __settingOption.onSelected += () => 
+                {
+                    selection.position = __settingOption.Position;
+                };
+
                 __settingOption.Initiate();
 
                 _options.Add(__settingOption);
@@ -60,10 +64,10 @@ public class SettingsDisplay : Display
         }
     }
 
-    protected override void SelectOption(UIOption p_option)
+    public override void SelectOption(UIOption p_option)
     {
-        base.SelectOption(p_option);
         selection.GetComponent<Image>().enabled = p_option is SettingOption;
+        base.SelectOption(p_option);
     }
 
     protected override void HandleHorizontalMovementActive(int p_dir) => SelectedOption.UpdateOptionActive(p_dir);
