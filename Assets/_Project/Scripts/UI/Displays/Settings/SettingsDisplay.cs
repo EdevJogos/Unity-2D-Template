@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class SettingsDisplay : Display
 {
-    public const int BACK = 0;
-
     public Transform selection;
     public GridLayoutGroup optionsGrid;
 
@@ -69,8 +67,8 @@ public class SettingsDisplay : Display
         base.SelectOption(p_option);
     }
 
-    protected override void HandleHorizontalMovementActive(int p_dir) => SelectedOption.UpdateOptionActive(p_dir);
-    protected override void HandleHorizontalMovementDelayed(int p_dir) => SelectedOption.UpdateOptionActiveDelayed(p_dir);
-    protected override void HandleVerticalMovementActive(int p_dir) { }
-    protected override void UI_InputHandler_onCancelRequested(int p_id) => RequestAction(BACK);
+    protected override void HandleHorizontalMovementActive(int p_id, int p_dir) => SelectedOption.UpdateOptionActive(p_dir);
+    protected override void HandleHorizontalMovementDelayed(int p_id, int p_dir) => SelectedOption.UpdateOptionActiveDelayed(p_dir);
+    protected override void HandleVerticalMovementActive(int p_id, int p_dir) { }
+    protected override void UI_InputHandler_onCancelRequested(int p_id) => RequestAction(BACK, _backTo);
 }

@@ -10,19 +10,22 @@ public class Display : MonoBehaviour
         TWEEN,
     }
 
+    public const int BACK = 0;
+
     public static System.Action<Displays, int, object> onActionRequested;
 
     public Displays ID => id;
 
     [SerializeField] protected DisplayTypes type;
     [SerializeField] protected Displays id;
+    [SerializeField] protected Displays _backTo;
     [SerializeField] protected AnimationStyles animationStyle;
     [Tooltip("When true it will listen to all players inputs once the display is active")]
     [SerializeField] protected bool _receiveInputWhenActive = true;
     [Tooltip("When true it will listen to the whileActive callback, which is called every frame while move input != 0, override it on the display to work only certain cases if needed")]
     [SerializeField] protected bool _useWhileActiveInput = false;
     [SerializeField] protected UIOption _startSelected;
-
+    
     protected UIOption _curSelected;
 
     public virtual void Initiate() { }
@@ -180,22 +183,22 @@ public class Display : MonoBehaviour
         if (Mathf.Abs(p_dir.x) > 0.1f)
         {
             int __direction = p_dir.x > 0 ? 1 : -1;
-            if (p_delayed) HandleHorizontalMovementDelayed(__direction); else HandleHorizontalMovementActive(__direction);
+            if (p_delayed) HandleHorizontalMovementDelayed(p_id, __direction); else HandleHorizontalMovementActive(p_id, __direction);
 
         }
         else if (Mathf.Abs(p_dir.y) > 0.1f)
         {
             int __direction = p_dir.y > 0 ? 1 : -1;
 
-            if (p_delayed) HandleVerticalMovementDelayed(__direction); else HandleVerticalMovementActive(__direction);
+            if (p_delayed) HandleVerticalMovementDelayed(p_id, __direction); else HandleVerticalMovementActive(p_id, __direction);
         }
     }
     //It uses the Editor Navigation to define the order in which the elemets will be selected when an input is made, assing it on the editor for each UIOption.
     //All UI Selectables must be an UIOption or derive from it.
-    protected virtual void HandleHorizontalMovementActive(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
-    protected virtual void HandleHorizontalMovementDelayed(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
-    protected virtual void HandleVerticalMovementActive(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
-    protected virtual void HandleVerticalMovementDelayed(int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
+    protected virtual void HandleHorizontalMovementActive(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
+    protected virtual void HandleHorizontalMovementDelayed(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
+    protected virtual void HandleVerticalMovementActive(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
+    protected virtual void HandleVerticalMovementDelayed(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
     public virtual void SelectOption(UIOption p_option)
     {
         if (p_option == null)
@@ -215,6 +218,6 @@ public class Display : MonoBehaviour
 
     public virtual object GetData(int p_data) { return null; }
 
-    public virtual void RequestAction(int p_action) => RequestAction(p_action, null);
+    public virtual void RequestAction(int p_action) => RequestAction(p_action, p_action == 0 ? _backTo : null);
     public virtual void RequestAction(int p_action, object p_data) => onActionRequested?.Invoke(ID, p_action, p_data);
 }

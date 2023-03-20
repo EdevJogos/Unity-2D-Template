@@ -55,6 +55,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 0
   id: 7
+  _backTo: 1
   animationStyle: 0
   _receiveInputWhenActive: 1
   _useWhileActiveInput: 1
@@ -719,6 +720,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_display: {fileID: 0}
   _valueText: {fileID: 3403459404093823785}
 --- !u!114 &3403459404093823785 stripped
 MonoBehaviour:
@@ -1392,6 +1394,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_display: {fileID: 0}
   _valueText: {fileID: 3403459405261485983}
 --- !u!224 &3403459404348589442 stripped
 RectTransform:

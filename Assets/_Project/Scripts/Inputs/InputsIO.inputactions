@@ -164,8 +164,8 @@
                     "type": "Value",
                     "id": "aa7155dc-c64b-46ed-a434-3d9bebe630f7",
                     "expectedControlType": "Vector2",
-                    "processors": "StickDeadzone(min=0.2,max=1)",
-                    "interactions": "Press(behavior=2)",
+                    "processors": "StickDeadzone",
+                    "interactions": "",
                     "initialStateCheck": true
                 },
                 {

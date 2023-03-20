@@ -10,8 +10,10 @@ public class InputManager : Manager
     public static Vector2 MouseWorld { get { return CameraManager.MainCamera.ScreenToWorldPoint(Input.mousePosition); } }
     public static List<InputListener> InputListeners => Instance._inputListeners;
 
-    public event Action onPlayerJoined;
+    public event Action<int> onPlayerJoined;
     public event Action onPlayerLeft;
+
+    public GeneralIO GeneralIO { get; private set; }
 
     [SerializeField] private InputMaps _startInputMap;
     [SerializeField, ReadyOnly] private InputMaps _curInputMap;
@@ -21,6 +23,9 @@ public class InputManager : Manager
     public override void Initiate()
     {
         Instance = this;
+
+        GeneralIO = new GeneralIO();
+        GeneralIO.Enable();
 
         CreateInputListener();
     }
@@ -45,7 +50,10 @@ public class InputManager : Manager
 
     public void Join(InputDevice p_device)
     {
+        _inputListeners[0].SetKeyboardAndMouse();
+        CreateInputListener().SetDevice(p_device);
 
+        onPlayerJoined?.Invoke(_inputListeners.Count - 1);
     }
 
     public void Leave(InputDevice p_device)

@@ -9,7 +9,7 @@ public class UIOption : Selectable, ISubmitHandler
 
     public event System.Action onSelected;
 
-    [SerializeField] private Display m_display;
+    private Display m_display;
 
     private Display Display
     {

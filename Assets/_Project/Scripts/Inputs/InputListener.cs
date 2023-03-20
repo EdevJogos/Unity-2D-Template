@@ -16,19 +16,26 @@ public class InputListener
 
         InputsIO.UI.Enable();
         InputsIO.UI.Movement.performed += UI.MovementPerformed;
+        InputsIO.UI.Movement.canceled += UI.MovementCanceled;
         InputsIO.UI.Confirm.performed += UI.ConfirmPerformed;
         InputsIO.UI.Cancel.performed += UI.CancelPerformed;
 
         _curInput = UI;
         _curInput.Initiate(this);
     }
+
     public void Initialize() => _curInput.Initialize();
     public void Tick() => _curInput.Tick();
     public void Enable() => _curInput.Enable();
     public void Disable() => _curInput.Disable();
     public void SetDevice(InputDevice p_device)
     {
-        
+        InputsIO.devices = new InputDevice[] { p_device };
+    }
+
+    public void SetKeyboardAndMouse()
+    {
+        InputsIO.devices = new InputDevice[] { Keyboard.current, Mouse.current };
     }
 }
 
@@ -56,7 +63,7 @@ public class UIInputs : InputHandler
     }
     public override void Tick()
     {
-        if(_moveInput.magnitude > 0)
+        if(_moveInput.magnitude >= 0.1f)
         {
             _moveDelay -= Time.deltaTime;
 
@@ -80,8 +87,16 @@ public class UIInputs : InputHandler
 
     public void MovementPerformed(InputAction.CallbackContext p_context)
     {
-        _moveDelay = 0.0f;
+        if(_moveInput.magnitude < 0.1f) 
+            _moveDelay = 0.0f;
+
         _moveInput = p_context.ReadValue<Vector2>();
+    }
+
+    public void MovementCanceled(InputAction.CallbackContext p_context)
+    {
+        _moveDelay = 0.0f;
+        _moveInput = Vector2.zero;
     }
 
     public void ConfirmPerformed(InputAction.CallbackContext p_context) => onConfirmRequested?.Invoke(InputManager.GetInputID(_listener));

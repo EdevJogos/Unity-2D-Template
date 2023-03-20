@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class GUIManager : Manager
 {
-    public struct DisplayAction
+    private struct DisplayAction
     {
         public int actionID;
         public Action<object> action;
@@ -18,6 +18,7 @@ public class GUIManager : Manager
     }
 
     public event Action<object> onJoinRequested;
+    public event Action<object> onSwitchCharacterRequested;
 
     [SerializeField] private Transform _displaysHolder;
 
@@ -40,14 +41,6 @@ public class GUIManager : Manager
             _displays.Add(__display.ID, __display);
             _displayActions.Add(__display.ID, new List<DisplayAction>());
         }
-
-        _displayActions[Displays.INTRO].Add(new DisplayAction(1, (p_data) => { ShowDisplay(Displays.LOBBY); }));
-        _displayActions[Displays.INTRO].Add(new DisplayAction(2, (p_data) => { ShowDisplay(Displays.SETTINGS); }));
-
-        _displayActions[Displays.SETTINGS].Add(new DisplayAction(0, (p_data) => { ShowDisplay(Displays.INTRO); }));
-
-        _displayActions[Displays.LOBBY].Add(new DisplayAction(0, (p_data) => { ShowDisplay(Displays.INTRO); }));
-        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.JOIN, onJoinRequested));
     }
 
     private void OnDestroy()
@@ -61,6 +54,16 @@ public class GUIManager : Manager
         {
             __display.Initialize();
         }
+
+        _displayActions[Displays.INTRO].Add(new DisplayAction(Display.BACK, (p_data) => { Application.Quit(); }));
+        _displayActions[Displays.INTRO].Add(new DisplayAction(1, (p_data) => { ShowDisplay(Displays.LOBBY); }));
+        _displayActions[Displays.INTRO].Add(new DisplayAction(2, (p_data) => { ShowDisplay(Displays.SETTINGS); }));
+
+        _displayActions[Displays.SETTINGS].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
+
+        _displayActions[Displays.LOBBY].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
+        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.JOIN, onJoinRequested));
+        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.SWITCH_CHARACTER, onSwitchCharacterRequested));
     }
 
     public override void Renew()

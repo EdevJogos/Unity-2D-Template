@@ -45,22 +45,28 @@ public partial class GameCEO : MonoBehaviour
 
     private void Initiate()
     {
-        _guiManager = _managersHolder.GetComponentInChildren<GUIManager>();
-        _inputManager = _managersHolder.GetComponentInChildren<InputManager>();
-        _cameraManager = _managersHolder.GetComponentInChildren<CameraManager>();
-        _audioManager = _managersHolder.GetComponentInChildren<AudioManager>();
-        _agentsManager = _managersHolder.GetComponentInChildren<AgentsManager>();
-        _stageManager = _managersHolder.GetComponentInChildren<StageManager>();
-
         foreach (Transform __transform in _managersHolder)
         {
             if(__transform.TryGetComponent(out Manager __manager))
             {
+                switch(__manager)
+                {
+                    case GUIManager:  _guiManager = __manager as GUIManager; break;
+                    case InputManager: _inputManager = __manager as InputManager; break;
+                    case CameraManager: _cameraManager = __manager as CameraManager; break;
+                    case AudioManager: _audioManager = __manager as AudioManager; break;
+                    case AgentsManager: _agentsManager = __manager as AgentsManager; break;
+                    case StageManager: _stageManager = __manager as StageManager; break;
+                }
+
                 __manager.Initiate();
             }
         }
 
         _guiManager.onJoinRequested += GUIManager_onJoinRequested;
+        _guiManager.onSwitchCharacterRequested += _guiManager_onSwitchCharacterRequested;
+
+        _inputManager.onPlayerJoined += _inputManager_onPlayerJoined;
     }
 
     public void Initialize()
@@ -99,14 +105,4 @@ public partial class GameCEO : MonoBehaviour
             yield return null;
         }
     }
-
-    //-----------------INPUT MANAGER------------------
-
-    //-----------------GUI MANAGER------------------
-
-    //-----------------SCORE MANAGER----------------
-
-    //-----------------STAGE MANAGER----------------
-
-    //-----------------AGENTS MANAGER----------------
 }
