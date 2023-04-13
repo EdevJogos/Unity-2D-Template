@@ -17,8 +17,10 @@ public class GUIManager : Manager
         }
     }
 
+    public event Action<object> onLobbyRequested;
     public event Action<object> onJoinRequested;
     public event Action<object> onSwitchCharacterRequested;
+    public event Action<object> onAllPlayersReady;
 
     [SerializeField] private Transform _displaysHolder;
 
@@ -56,17 +58,21 @@ public class GUIManager : Manager
         }
 
         _displayActions[Displays.INTRO].Add(new DisplayAction(Display.BACK, (p_data) => { Application.Quit(); }));
-        _displayActions[Displays.INTRO].Add(new DisplayAction(1, (p_data) => { ShowDisplay(Displays.LOBBY); }));
+        _displayActions[Displays.INTRO].Add(new DisplayAction(1, onLobbyRequested));
         _displayActions[Displays.INTRO].Add(new DisplayAction(2, (p_data) => { ShowDisplay(Displays.SETTINGS); }));
+        _displayActions[Displays.INTRO].Add(new DisplayAction(3, (p_data) => { ShowDisplay(Displays.CREDITS); }));
 
         _displayActions[Displays.SETTINGS].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
+
+        _displayActions[Displays.CREDITS].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
 
         _displayActions[Displays.LOBBY].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
         _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.JOIN, onJoinRequested));
         _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.SWITCH_CHARACTER, onSwitchCharacterRequested));
+        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.ALL_PLAYERS_READY, onAllPlayersReady));
     }
 
-    public override void Renew()
+    public override void Restart()
     {
         
     }

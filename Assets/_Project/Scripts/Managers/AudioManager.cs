@@ -92,7 +92,7 @@ public class AudioManager : Manager
         VoiceVol(PlayerPrefs.GetFloat("VoiceVol"));
     }
 
-    public override void Renew()
+    public override void Restart()
     {
         
     }

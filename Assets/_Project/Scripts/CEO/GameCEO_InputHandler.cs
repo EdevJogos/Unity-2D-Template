@@ -7,7 +7,7 @@ public partial class GameCEO
     {
         _guiManager.UpdateDisplay(Displays.LOBBY, LobbyDisplay.UPDATE_JOINED_STATE, p_id);
 
-        CharacterData __character = GetCharacter(_agentsManager.characterIndex[p_id]);
+        CharacterData __character = GetCharacter(_agentsManager.CharacterIndexes[p_id]);
         _guiManager.UpdateDisplay(Displays.LOBBY, LobbyDisplay.UPDATE_CHARACTER, new object[2] { p_id, __character });
     }
 }

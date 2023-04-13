@@ -22,7 +22,7 @@ public class CameraManager : Manager
         
     }
 
-    public override void Renew()
+    public override void Restart()
     {
         
     }

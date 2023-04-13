@@ -43,7 +43,7 @@ public class InputManager : Manager
         }
     }
 
-    public override void Renew()
+    public override void Restart()
     {
         
     }

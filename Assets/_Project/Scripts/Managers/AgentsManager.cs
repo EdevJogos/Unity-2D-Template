@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AgentsManager : Manager
 {
-    public int[] characterIndex = new int[2] { 0, 0 };
+    public List<int> CharacterIndexes { get; private set; } = new() { 0 };
 
     public override void Initiate()
     {
@@ -14,7 +15,7 @@ public class AgentsManager : Manager
         
     }
 
-    public override void Renew()
+    public override void Restart()
     {
         
     }

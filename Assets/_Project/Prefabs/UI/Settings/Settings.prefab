@@ -315,12 +315,40 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8591194883051776748}
     - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8591194881594511993}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
       propertyPath: _onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 8591194881594511993}
     - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: RequestAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
       propertyPath: _onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: RequestAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Display, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891350425235406870, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
+      propertyPath: onPointerUp.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 5287814326912143536, guid: 1dccdf03350832047aa48f0d490cd816, type: 3}
       propertyPath: m_AnchorMax.y
@@ -705,7 +733,7 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 0}
-  _onPointerUp:
+  onPointerUp:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8591194882516140781}
@@ -720,7 +748,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_display: {fileID: 0}
   _valueText: {fileID: 3403459404093823785}
 --- !u!114 &3403459404093823785 stripped
 MonoBehaviour:
@@ -1379,7 +1406,7 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 0}
-  _onPointerUp:
+  onPointerUp:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8591194883051776748}
@@ -1394,7 +1421,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_display: {fileID: 0}
   _valueText: {fileID: 3403459405261485983}
 --- !u!224 &3403459404348589442 stripped
 RectTransform:

@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Display : MonoBehaviour
 {
@@ -22,13 +24,19 @@ public class Display : MonoBehaviour
     [SerializeField] protected AnimationStyles animationStyle;
     [Tooltip("When true it will listen to all players inputs once the display is active")]
     [SerializeField] protected bool _receiveInputWhenActive = true;
-    [Tooltip("When true it will listen to the whileActive callback, which is called every frame while move input != 0, override it on the display to work only certain cases if needed")]
+    [Tooltip("When true it will listen to the whileActive callback, which is called every frame while move input != 0, override it on the display to work only on certain cases if needed")]
     [SerializeField] protected bool _useWhileActiveInput = false;
     [SerializeField] protected UIOption _startSelected;
-    
+
+    protected Canvas _canvas;
+    protected GraphicRaycaster _graphicRaycaster;
     protected UIOption _curSelected;
 
-    public virtual void Initiate() { }
+    public virtual void Initiate() 
+    {
+        _canvas = GetComponent<Canvas>();
+        _graphicRaycaster = GetComponent<GraphicRaycaster>();
+    }
     public virtual void Initialize() { }
 
     public virtual void Show(bool p_show, System.Action p_onCompleted, float p_ratio)
@@ -118,12 +126,12 @@ public class Display : MonoBehaviour
     /// Override this to write the animation that will be executed when ShowDisplay is called.
     /// base will call the onCompleted callback, be careful to not end up calling it twiece.
     /// </summary>
-    protected virtual void TweenInAnimation(System.Action p_onCompleted) { p_onCompleted?.Invoke(); }
+    protected async virtual void TweenInAnimation(System.Action p_onCompleted) { await Task.Yield(); p_onCompleted?.Invoke(); }
     /// <summary>
     /// Override this to write the animation that will be executed when HideDisplay is called.
     /// base will call the onCompleted callback, be careful to not end up calling it twiece.
     /// </summary>
-    protected virtual void TweenOutAnimation(System.Action p_onCompleted) { p_onCompleted?.Invoke(); }
+    protected async virtual void TweenOutAnimation(System.Action p_onCompleted) { await Task.Yield(); p_onCompleted?.Invoke(); }
     #endregion
 
     #region Inputs

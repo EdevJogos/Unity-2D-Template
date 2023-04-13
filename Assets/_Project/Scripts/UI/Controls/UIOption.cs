@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class UIOption : Selectable, ISubmitHandler
 {
-    [SerializeField] private UnityEvent _onPointerUp;
+    public UnityEvent onPointerUp;
 
     public event System.Action onSelected;
 
@@ -21,6 +21,11 @@ public class UIOption : Selectable, ISubmitHandler
             }
             return m_display;
         }
+    }
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        onPointerUp.RemoveAllListeners();
     }
 
     public override void OnSelect(BaseEventData eventData)
@@ -38,11 +43,11 @@ public class UIOption : Selectable, ISubmitHandler
     public override void OnPointerUp(PointerEventData eventData)
     {
         base.OnPointerUp(eventData);
-        _onPointerUp?.Invoke();
+        onPointerUp?.Invoke();
     }
 
     public void OnSubmit(BaseEventData eventData)
     {
-        _onPointerUp?.Invoke();
+        onPointerUp?.Invoke();
     }
 }

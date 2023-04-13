@@ -63,7 +63,7 @@ public class SettingsDisplay : Display
 
     public override void SelectOption(UIOption p_option)
     {
-        selection.GetComponent<Image>().enabled = p_option is SettingOption;
+        selection.GetComponent<Image>().enabled = p_option is SettingOption or ButtonControl;
         base.SelectOption(p_option);
     }
 

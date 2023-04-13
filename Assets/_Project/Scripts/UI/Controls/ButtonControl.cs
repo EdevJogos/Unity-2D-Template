@@ -1,8 +1,13 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using TMPro;
 
 public class ButtonControl : UIOption
 {
-    
+    public bool Enabled
+    { 
+        get { return gameObject.activeSelf; }
+        set { gameObject.SetActive(value); }
+    }
+
+    [SerializeField] private TextMeshProUGUI buttonText;
 }
