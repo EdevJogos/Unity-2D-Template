@@ -55,10 +55,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 0
   id: 9
-  _backTo: 1
   animationStyle: 0
-  _useDefaultNavigation: 1
-  _startSelected: {fileID: 0}
   _emptyDescription: Press [Start] to join
   _spriteEmpty: {fileID: 21300000, guid: 3fcfcefc0ad6ddd4ab9f1d21e4975a31, type: 3}
   _countdownText: {fileID: 393925345705948995}
@@ -71,7 +68,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 443020781432033320}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 0}

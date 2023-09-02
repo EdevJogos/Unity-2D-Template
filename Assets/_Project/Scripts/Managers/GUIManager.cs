@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using ETemplate.UI;
-using UnityEngine.Events;
 
 namespace ETemplate.Manager
 {

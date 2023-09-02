@@ -10,7 +10,5 @@ namespace ETemplate.UI
             get { return gameObject.activeSelf; }
             set { gameObject.SetActive(value); }
         }
-
-        [SerializeField] private TextMeshProUGUI buttonText;
     }
 }

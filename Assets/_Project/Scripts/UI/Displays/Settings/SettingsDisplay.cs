@@ -76,7 +76,12 @@ namespace ETemplate.UI
                 imageSelection.enabled = true;
                 imageSelection.transform.position = p_selectable.transform.position;
             }
-            else imageSelection.enabled = false;
+            else if(p_selectable.navigation.mode == UnityEngine.UI.Navigation.Mode.None)
+            {
+                imageSelection.enabled = true;
+            }
+            else
+                imageSelection.enabled = false;
         }
 
         //Calls UpdateOptionActiveDelayed to update the selection options like (Resolution and Window mode).
