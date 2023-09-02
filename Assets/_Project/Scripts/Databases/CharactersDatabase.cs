@@ -18,7 +18,7 @@ public class CharactersDatabase : MonoBehaviour, IDatabase
         s_Instance = this;
     }
 
-    public static CharacterData GetCharacter(int p_index)
+    public static CharacterData GetCharacterData(int p_index)
     {
         return s_Instance._characters[p_index];
     }

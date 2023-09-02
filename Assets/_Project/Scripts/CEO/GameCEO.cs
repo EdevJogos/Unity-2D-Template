@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using ETemplate.Manager;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -43,7 +44,7 @@ public partial class GameCEO : MonoBehaviour
         Initialize();
     }
 
-    private void Initiate()
+    protected void Initiate()
     {
         foreach (Transform __transform in _managersHolder)
         {
@@ -63,14 +64,9 @@ public partial class GameCEO : MonoBehaviour
             }
         }
 
-        _guiManager.onLobbyRequested += _guiManager_onLobbyRequested;
-        _guiManager.onJoinRequested += GUIManager_onJoinRequested;
-        _guiManager.onSwitchCharacterRequested += _guiManager_onSwitchCharacterRequested;
-        _guiManager.onAllPlayersReady += _guiManager_onAllPlayersReady;
-
-        _inputManager.onPlayerJoined += _inputManager_onPlayerJoined;
-
-        _stageManager.onStartCountdownUpdated += _stageManager_onStartCountdownUpdated;
+        _guiManager.onIntroDisplayRequested += DisplayIntro;
+        _guiManager.onCreditsDisplayRequested += DisplayCredits;
+        _guiManager.onSettingsDisplayRequested += DisplaySettings;
     }
 
     public void Initialize()
@@ -108,10 +104,5 @@ public partial class GameCEO : MonoBehaviour
         {
             yield return null;
         }
-    }
-
-    private void _stageManager_onStartCountdownUpdated(float p_countdown)
-    {
-        _guiManager.UpdateDisplay(Displays.LOBBY, LobbyDisplay.UPDATE_COUNTDOWN, p_countdown);
     }
 }

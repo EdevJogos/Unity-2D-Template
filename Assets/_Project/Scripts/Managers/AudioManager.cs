@@ -3,266 +3,186 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class AudioManager : Manager
+namespace ETemplate.Manager
 {
-    private static AudioManager Instance;
-
-    [System.Serializable]
-    public class ClipData
+    public class AudioManager : Manager
     {
-        #if UNITY_EDITOR_WIN
-        public string name;
-        #endif
-        public SFXOccurrence occurrence;
-        public float volume = 1;
-        public float pitch = 1;
-        public Range randPitch;
-        public AudioClip[] audioClip;
-    }
+        private static AudioManager Instance;
 
-    [System.Serializable]
-    public class VoiceClipData
-    {
-        public Characters character;
-        public ClipData[] voiceClips;
-    }
-
-    public AudioMixer audioMixer;
-    public SFXSource sfxSourcePrefab;
-
-    [Header("SFXS")]
-    public GameObject sfxAudioSources;
-    public AudioMixerGroup sfxMixerGroup;
-    public ClipData[] sfxClips;
-    public ClipData[] sfxUiClips;
-    [Header("Voices")]
-    public AudioMixerGroup voiceMixerGroup;
-    public VoiceClipData[] voiceClips;
-
-    public static bool Mute = false;
-    public static SFXSource SFXSourcePrefab;
-    public static Dictionary<SFXOccurrence, ClipData> SFXClips = new Dictionary<SFXOccurrence, ClipData>();
-    public static Dictionary<Characters, ClipData[]> VoiceClips = new Dictionary<Characters, ClipData[]>();
-    private static List<AudioSource> SFXSources = new List<AudioSource>(20);
-
-    public override void Initiate()
-    {
-        Instance = this;
-        SFXSourcePrefab = sfxSourcePrefab;
-    }
-
-    public override void Initialize()
-    {
-        for (int __i = 0; __i < sfxClips.Length; __i++)
+        [System.Serializable]
+        public class ClipData
         {
-            SFXClips.Add(sfxClips[__i].occurrence, sfxClips[__i]);
+#if UNITY_EDITOR_WIN
+            public string name;
+#endif
+            public SFXOccurrence occurrence;
+            public float volume = 1;
+            public float pitch = 1;
+            public Range randPitch;
+            public AudioClip[] audioClip;
         }
 
-        for (int __i = 0; __i < sfxUiClips.Length; __i++)
+        [System.Serializable]
+        public class VoiceClipData
         {
-            SFXClips.Add(sfxUiClips[__i].occurrence, sfxUiClips[__i]);
+            public Characters character;
+            public ClipData[] voiceClips;
         }
 
-        for (int __i = 0; __i < voiceClips.Length; __i++)
+        public AudioMixer audioMixer;
+        public SFXSource sfxSourcePrefab;
+
+        [Header("SFXS")]
+        public GameObject sfxAudioSources;
+        public AudioMixerGroup sfxMixerGroup;
+        public ClipData[] sfxClips;
+        public ClipData[] sfxUiClips;
+        [Header("Voices")]
+        public AudioMixerGroup voiceMixerGroup;
+        public VoiceClipData[] voiceClips;
+
+        public static bool Mute = false;
+        public static SFXSource SFXSourcePrefab;
+        public static Dictionary<SFXOccurrence, ClipData> SFXClips = new Dictionary<SFXOccurrence, ClipData>();
+        public static Dictionary<Characters, ClipData[]> VoiceClips = new Dictionary<Characters, ClipData[]>();
+        private static List<AudioSource> SFXSources = new List<AudioSource>(20);
+
+        public override void Initiate()
         {
-            VoiceClips.Add(voiceClips[__i].character, voiceClips[__i].voiceClips);
+            Instance = this;
+            SFXSourcePrefab = sfxSourcePrefab;
         }
 
-        for (int __i = 0; __i < 15; __i++)
+        public override void Initialize()
         {
-            AudioSource __source = sfxAudioSources.AddComponent<AudioSource>();
-
-            SFXSources.Add(__source);
-        }
-
-        if(!PlayerPrefs.HasKey("DefaultVolumeSet"))
-        {
-            PlayerPrefs.SetFloat("MasterVol", 1f);
-            PlayerPrefs.SetFloat("MusicVol", 1f);
-            PlayerPrefs.SetFloat("SFXVol", 1f);
-            PlayerPrefs.SetFloat("VoiceVol", 1f);
-
-            PlayerPrefs.SetInt("DefaultVolumeSet", 1);
-            PlayerPrefs.Save();
-        }
-
-        MasterVol(PlayerPrefs.GetFloat("MasterVol"));
-        MusicVol(PlayerPrefs.GetFloat("MusicVol"));
-        SFXVol(PlayerPrefs.GetFloat("SFXVol"));
-        VoiceVol(PlayerPrefs.GetFloat("VoiceVol"));
-    }
-
-    public override void Restart()
-    {
-        
-    }
-
-    public static void PlaySFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pan = 0f)
-    {
-        for (int __i = 0; __i < SFXSources.Count; __i++)
-        {
-            if (!SFXSources[__i].isPlaying)
+            for (int __i = 0; __i < sfxClips.Length; __i++)
             {
-                ClipData __data = SFXClips[p_occurrence];
-                SFXSources[__i].outputAudioMixerGroup = Instance.sfxMixerGroup;
-                PlayClip(SFXSources[__i], __data, p_index, p_pan);
+                SFXClips.Add(sfxClips[__i].occurrence, sfxClips[__i]);
+            }
 
-                break;
+            for (int __i = 0; __i < sfxUiClips.Length; __i++)
+            {
+                SFXClips.Add(sfxUiClips[__i].occurrence, sfxUiClips[__i]);
+            }
+
+            for (int __i = 0; __i < voiceClips.Length; __i++)
+            {
+                VoiceClips.Add(voiceClips[__i].character, voiceClips[__i].voiceClips);
+            }
+
+            for (int __i = 0; __i < 15; __i++)
+            {
+                AudioSource __source = sfxAudioSources.AddComponent<AudioSource>();
+
+                SFXSources.Add(__source);
+            }
+
+            if (!PlayerPrefs.HasKey("DefaultVolumeSet"))
+            {
+                PlayerPrefs.SetFloat("MasterVol", 1f);
+                PlayerPrefs.SetFloat("MusicVol", 1f);
+                PlayerPrefs.SetFloat("SFXVol", 1f);
+                PlayerPrefs.SetFloat("VoiceVol", 1f);
+
+                PlayerPrefs.SetInt("DefaultVolumeSet", 1);
+                PlayerPrefs.Save();
+            }
+
+            MasterVol(PlayerPrefs.GetFloat("MasterVol"));
+            MusicVol(PlayerPrefs.GetFloat("MusicVol"));
+            SFXVol(PlayerPrefs.GetFloat("SFXVol"));
+            VoiceVol(PlayerPrefs.GetFloat("VoiceVol"));
+        }
+
+        public static void PlaySFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pan = 0f)
+        {
+            for (int __i = 0; __i < SFXSources.Count; __i++)
+            {
+                if (!SFXSources[__i].isPlaying)
+                {
+                    ClipData __data = SFXClips[p_occurrence];
+                    SFXSources[__i].outputAudioMixerGroup = Instance.sfxMixerGroup;
+                    PlayClip(SFXSources[__i], __data, p_index, p_pan);
+
+                    break;
+                }
             }
         }
-    }
 
-    public static void PlaySFX(AudioSource p_source, ClipData p_data, int p_index = 0, float p_pan = 0f)
-    {
-        PlayClip(p_source, p_data, p_index, p_pan);
-    }
-
-    public static SFXSource PlayLoopSFX(SFXOccurrence p_occurrence, int p_index = 0, float p_pan = 0f)
-    {
-        SFXSource __sfxSource = Instantiate(SFXSourcePrefab, Vector3.zero, Quaternion.identity);
-        AudioSource __audioSource = __sfxSource.GetComponent<AudioSource>();
-        ClipData __data = SFXClips[p_occurrence];
-
-        __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
-        __audioSource.loop = true;
-        __sfxSource.SetClipData(__data, true);
-
-        PlayClip(__audioSource, __data, p_index, p_pan);
-
-        return __sfxSource;
-    }
-
-    public static SFXSource CreateSFXSource(SFXOccurrence p_occurrence, Transform p_parent, Vector2 p_position)
-    {
-        SFXSource __sfxSource = Instantiate(SFXSourcePrefab, p_position, Quaternion.identity, p_parent);
-        AudioSource __audioSource = __sfxSource.GetComponent<AudioSource>();
-        ClipData __data = SFXClips[p_occurrence];
-
-        __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
-        __sfxSource.SetClipData(__data, true);
-
-        return __sfxSource;
-    }
-
-    public static void PlaySFX(SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0, float p_pan = 0f)
-    {
-        ClipData __data = SFXClips[p_occurrence];
-        p_source.outputAudioMixerGroup = Instance.sfxMixerGroup;
-        PlayClip(p_source, __data, p_index, p_pan);
-    }
-
-    public static void PlaySFX(Characters p_character, SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0, float p_pan = 0f)
-    {
-        ClipData[] __clips = VoiceClips[p_character];
-
-        for (int __i = 0; __i < __clips.Length; __i++)
+        public static void PlaySFX(AudioSource p_source, ClipData p_data, int p_index = 0, float p_pan = 0f)
         {
-            ClipData __data = __clips[__i];
+            PlayClip(p_source, p_data, p_index, p_pan);
+        }
 
-            if(__data.occurrence == p_occurrence)
+        private static void PlayClip(AudioSource p_source, ClipData p_data, int p_clipIndex, float p_pan)
+        {
+            float __pitch = p_data.pitch + p_data.randPitch.Value;
+
+            PlayClip(p_source, p_data.audioClip[p_clipIndex], p_data.volume, __pitch, p_pan);
+        }
+
+        private static void PlayClip(AudioSource p_source, AudioClip p_clip, float p_volume, float p_pitch, float p_pan)
+        {
+            p_source.clip = p_clip;
+            p_source.pitch = p_pitch;
+            p_source.panStereo = p_pan;
+            p_source.volume = p_volume;
+            p_source.Play();
+        }
+
+        private static IEnumerator RoutineStopSFX(AudioSource p_source, float p_speed = 1f)
+        {
+            while (p_source.volume > 0f)
             {
-                int __index = p_index < 0 ? Random.Range(0, __data.audioClip.Length + (p_index + 1)) : p_index;
-                p_source.outputAudioMixerGroup = Instance.voiceMixerGroup;
-                PlayClip(p_source, __data, __index, p_pan);
+                p_source.volume -= p_speed * Time.deltaTime;
 
-                break;
+                yield return null;
+            }
+
+            p_source.Stop();
+        }
+
+        /// <summary>
+        /// Channels: 0 Master, 1 Music, 2 SFX
+        /// </summary>
+        public static void SetVolume(int p_channel, float p_value)
+        {
+            switch (p_channel)
+            {
+                case 0:
+                    Instance.MasterVol(p_value);
+                    break;
+                case 1:
+                    Instance.MusicVol(p_value);
+                    break;
+                case 2:
+                    Instance.SFXVol(p_value);
+                    break;
             }
         }
-    }
-
-    public static void PlaySFX(SFXOccurrence p_occurrence, Vector2 p_position, int p_index = 0, float p_pan = 0f)
-    {
-        SFXSource __sfxSource = Instantiate(SFXSourcePrefab, p_position, Quaternion.identity);
-        AudioSource __audioSource = __sfxSource.GetComponent<AudioSource>();
-        ClipData __data = SFXClips[p_occurrence];
-
-        __audioSource.outputAudioMixerGroup = Instance.sfxMixerGroup;
-
-        PlayClip(__audioSource, __data, p_index, p_pan);
-
-        __sfxSource.enabled = true;
-    }
-
-    public static void InitalizeAudioSource(SFXOccurrence p_occurrence, AudioSource p_source, int p_index = 0)
-    {
-        ClipData __data = SFXClips[p_occurrence];
-
-        p_source.clip = __data.audioClip[p_index];
-        p_source.volume = __data.volume;
-    }
-
-    public static void StopSFXSmooth(AudioSource p_source, float p_time = 1f)
-    {
-        Instance.StartCoroutine(RoutineStopSFX(p_source, p_time));
-    }
-
-    private static void PlayClip(AudioSource p_source, ClipData p_data, int p_clipIndex, float p_pan)
-    {
-        float __pitch = p_data.pitch + p_data.randPitch.Value;
-
-        PlayClip(p_source, p_data.audioClip[p_clipIndex], p_data.volume, __pitch, p_pan);
-    }
-
-    private static void PlayClip(AudioSource p_source, AudioClip p_clip, float p_volume, float p_pitch, float p_pan)
-    {
-        p_source.clip = p_clip;
-        p_source.pitch = p_pitch;
-        p_source.panStereo = p_pan;
-        p_source.volume = p_volume;
-        p_source.Play();
-    }
-
-    private static IEnumerator RoutineStopSFX(AudioSource p_source, float p_speed = 1f)
-    {
-        while (p_source.volume > 0f)
+        public void MasterVol(float p_value)
         {
-            p_source.volume -= p_speed * Time.deltaTime;
-
-            yield return null;
+            audioMixer.SetFloat("MasterVol", Mathf.Log10(p_value) * 20f);
+            PlayerPrefs.SetFloat("MasterVol", p_value);
         }
 
-        p_source.Stop();
-    }
-
-    /// <summary>
-    /// Channels: 0 Master, 1 Music, 2 SFX
-    /// </summary>
-    public static void SetVolume(int p_channel, float p_value)
-    {
-        switch (p_channel)
+        public void MusicVol(float p_value)
         {
-            case 0:
-                Instance.MasterVol(p_value);
-                break;
-            case 1:
-                Instance.MusicVol(p_value);
-                break;
-            case 2:
-                Instance.SFXVol(p_value);
-                break;
+            audioMixer.SetFloat("MusicVol", Mathf.Log10(p_value) * 20f);
+            PlayerPrefs.SetFloat("MusicVol", p_value);
+        }
+
+        public void SFXVol(float p_value)
+        {
+            audioMixer.SetFloat("SFXVol", Mathf.Log10(p_value) * 20f);
+            PlayerPrefs.SetFloat("SFXVol", p_value);
+        }
+
+        public void VoiceVol(float p_value)
+        {
+            audioMixer.SetFloat("VoiceVol", Mathf.Log10(p_value) * 20f);
+            PlayerPrefs.SetFloat("VoiceVol", p_value);
         }
     }
-    public void MasterVol(float p_value)
-    {
-        audioMixer.SetFloat("MasterVol", Mathf.Log10(p_value) * 20f);
-        PlayerPrefs.SetFloat("MasterVol", p_value);
-    }
 
-    public void MusicVol(float p_value)
-    {
-        audioMixer.SetFloat("MusicVol", Mathf.Log10(p_value) * 20f);
-        PlayerPrefs.SetFloat("MusicVol", p_value);
-    }
-
-    public void SFXVol(float p_value)
-    {
-        audioMixer.SetFloat("SFXVol", Mathf.Log10(p_value) * 20f);
-        PlayerPrefs.SetFloat("SFXVol", p_value);
-    }
-
-    public void VoiceVol(float p_value)
-    {
-        audioMixer.SetFloat("VoiceVol", Mathf.Log10(p_value) * 20f);
-        PlayerPrefs.SetFloat("VoiceVol", p_value);
-    }
 }

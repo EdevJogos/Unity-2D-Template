@@ -1,50 +1,64 @@
 ﻿using DG.Tweening;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class IntroDisplay : Display
+namespace ETemplate.UI
 {
-    [SerializeField] private Transform _body;
-
-    private List<ButtonControl> _buttons = new();
-
-    public override void Initialize()
+    public class IntroDisplay : Display
     {
-        base.Initialize();
-        _buttons.AddRange(_body.GetComponentsInChildren<ButtonControl>());
-        _buttons.ForEach(b => b.transform.localScale = Vector3.zero);
-    }
+        [SerializeField] private Transform _body;
+        [SerializeField] private UIButton _creditsButton;
+        [SerializeField] private UIButton _settingsButton;
 
-    protected async override void TweenInAnimation(Action p_onCompleted)
-    {
-        _canvas.enabled = true;
+        private List<UIButton> _buttons = new();
 
-        for (int __i = 0; __i < _buttons.Count; __i++)
+        public override void Initialize()
         {
-            _buttons[__i].transform.DOScale(1f, 0.5f);
-            await Task.Delay(100);
+            base.Initialize();
+            _buttons.AddRange(_body.GetComponentsInChildren<UIButton>());
+            _buttons.ForEach(b => b.transform.localScale = Vector3.zero);
         }
 
-        _graphicRaycaster.enabled = true;
-
-        p_onCompleted?.Invoke();
-    }
-
-    protected async override void TweenOutAnimation(Action p_onCompleted)
-    {
-        _graphicRaycaster.enabled = false;
-
-        for (int __i = 0; __i < _buttons.Count; __i++)
+        protected override void TweenInAnimation(Action p_onCompleted)
         {
-            _buttons[__i].transform.DOScale(0f, 0.5f);
-            await Task.Delay(100);
+            _canvas.enabled = true;
+            _graphicRaycaster.enabled = false;
+
+            Sequence seq = DOTween.Sequence().SetEase(Ease.Linear);
+
+            for (int __i = 0; __i < _buttons.Count; __i++)
+            {
+                seq.Join(_buttons[__i].transform.DOScale(1f, 0.25f + (__i * 0.25f)));
+            }
+
+            seq.AppendCallback(() =>
+            {
+                _graphicRaycaster.enabled = true;
+                p_onCompleted?.Invoke();
+            });
         }
+        protected override void TweenOutAnimation(Action p_onCompleted)
+        {
+            _graphicRaycaster.enabled = false;
 
-        _canvas.enabled = false;
+            Sequence seq = DOTween.Sequence().SetEase(Ease.Linear);
 
-        p_onCompleted?.Invoke();
+            for (int __i = 0; __i < _buttons.Count; __i++)
+            {
+                seq.Join(_buttons[__i].transform.DOScale(0f, 0.25f + (__i * 0.25f)));
+            }
+
+            seq.AppendCallback(() =>
+            {
+                _canvas.enabled = false;
+                p_onCompleted?.Invoke();
+            });
+        }
+        protected override void HandleEvents(bool subscribe)
+        {
+            _settingsButton.onPointerClick.HandleSubscribe(() => Navigation.OnDisplayRequested.Invoke(Displays.SETTINGS), subscribe);
+            _creditsButton.onPointerClick.HandleSubscribe(() => Navigation.OnDisplayRequested.Invoke(Displays.CREDITS), subscribe);
+        }
     }
 }

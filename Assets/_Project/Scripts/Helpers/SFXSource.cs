@@ -1,3 +1,4 @@
+using ETemplate.Manager;
 using UnityEngine;
 
 public class SFXSource : MonoBehaviour

@@ -1,15 +1,10 @@
 using System;
 using UnityEngine;
 
-public class MinigameDisplay : Display
+namespace ETemplate.UI
 {
-    public override void UpdateDisplay(int p_operation, float p_value, float p_data)
+    public class MinigameDisplay : Display
     {
-        switch (p_operation)
-        {
-            case 0:
-                GetComponent<Animator>().SetInteger("State", (int)p_value);
-                break;
-        }
+
     }
 }

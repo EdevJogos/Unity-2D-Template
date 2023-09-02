@@ -1,231 +1,143 @@
 ﻿using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
-public class Display : MonoBehaviour
+namespace ETemplate.UI
 {
-    public enum AnimationStyles
+    public class Display : MonoBehaviour
     {
-        DIRECT,
-        ANIMATOR,
-        TWEEN,
-    }
+        public UnityEvent OnShowStarted { private set; get; } = new UnityEvent();
+        public UnityEvent OnHideStarted { private set; get; } = new UnityEvent();
 
-    public const int BACK = 0;
-
-    public static System.Action<Displays, int, object> onActionRequested;
-
-    public Displays ID => id;
-
-    [SerializeField] protected DisplayTypes type;
-    [SerializeField] protected Displays id;
-    [SerializeField] protected Displays _backTo;
-    [SerializeField] protected AnimationStyles animationStyle;
-    [Tooltip("When true it will listen to all players inputs once the display is active")]
-    [SerializeField] protected bool _receiveInputWhenActive = true;
-    [Tooltip("When true it will listen to the whileActive callback, which is called every frame while move input != 0, override it on the display to work only on certain cases if needed")]
-    [SerializeField] protected bool _useWhileActiveInput = false;
-    [SerializeField] protected UIOption _startSelected;
-
-    protected Canvas _canvas;
-    protected GraphicRaycaster _graphicRaycaster;
-    protected UIOption _curSelected;
-
-    public virtual void Initiate() 
-    {
-        _canvas = GetComponent<Canvas>();
-        _graphicRaycaster = GetComponent<GraphicRaycaster>();
-    }
-    public virtual void Initialize() { }
-
-    public virtual void Show(bool p_show, System.Action p_onCompleted, float p_ratio)
-    {
-        if (p_show)
+        public enum AnimationStyles
         {
-            if(_receiveInputWhenActive) StartInputListeners();
+            DIRECT,
+            ANIMATOR,
+            TWEEN,
+        }
 
-            if (_startSelected != null)
+        public Displays ID => id;
+        public Navigation Navigation => _navigation;
+
+        [Tooltip("This define which display will be hidden when show is called, ex: if you call show on a type menu all other displays of type menu will be hidden, but the type main will remain." +
+        "Menus are always shown over Main and Pop-Ups are shown over menus")]
+        [SerializeField] protected DisplayTypes type;
+        [SerializeField] protected Displays id;
+        [Tooltip("What type of animation it will use to show/hide this display")]
+        [SerializeField] protected AnimationStyles animationStyle;
+
+        protected Canvas _canvas;
+        protected Navigation _navigation;
+        protected GraphicRaycaster _graphicRaycaster;
+
+        #region Behaviour
+        public virtual void Initiate()
+        {
+            _canvas = GetComponent<Canvas>();
+            _graphicRaycaster = GetComponent<GraphicRaycaster>();
+            _navigation = GetComponent<Navigation>();
+            _navigation?.Setup(this);
+
+            HandleEvents(true);
+        }
+        public virtual void Initialize()
+        {
+
+        }
+
+        protected virtual void OnDestroy()
+        {
+            _navigation?.Dismantle();
+            HandleEvents(false);
+        }
+        #endregion
+
+        public virtual void Show(bool p_show, System.Action p_onCompleted, float p_ratio)
+        {
+            if (p_show)
             {
-                _startSelected.Select();
-                _curSelected = _startSelected;
+                OnShowStarted?.Invoke();
             }
             else
             {
-                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+                OnHideStarted?.Invoke();
             }
-        }
-        else
-        {
-            StopInputListeners();
-        }
 
-        switch (animationStyle)
-        {
-            case AnimationStyles.DIRECT:
-                GetComponent<Canvas>().enabled = p_show;
-                GetComponent<UnityEngine.UI.GraphicRaycaster>().enabled = p_show;
-                p_onCompleted?.Invoke();
-                break;
-            case AnimationStyles.ANIMATOR:
-                HandleAnimator(p_show, p_onCompleted, p_ratio);
-                break;
-            case AnimationStyles.TWEEN:
-                HandleTween(p_show, p_onCompleted);
-                break;
-        }
-    }
-
-    #region Animator
-    private void HandleAnimator(bool p_show, System.Action p_callback, float p_ratio)
-    {
-        string __animation = p_show ? "In" : "Out";
-
-        if (TryGetComponent(out Animator __animator))
-        {
-            __animator.SetTrigger(__animation);
-
-            if (p_callback != null) StartCoroutine(RoutineShow(__animation, p_callback, p_ratio));
-        }
-        else
-        {
-            Debug.LogError("Requested animator animation style but animator could not be found.");
-        }
-    }
-
-    private IEnumerator RoutineShow(string p_animation, System.Action p_callback, float p_ratio)
-    {
-        float __delay = GetClipLength(p_animation) * GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).speed * p_ratio;
-        
-        yield return new WaitForSecondsRealtime(__delay);
-
-        p_callback?.Invoke();
-    }
-
-    private float GetClipLength(string name)
-    {
-        AnimationClip[] clips = GetComponent<Animator>().runtimeAnimatorController.animationClips;
-        foreach (var item in clips)
-        {
-            if (item.name == name)
+            switch (animationStyle)
             {
-                return item.length;
+                case AnimationStyles.DIRECT:
+                    GetComponent<Canvas>().enabled = p_show;
+                    GetComponent<GraphicRaycaster>().enabled = p_show;
+                    p_onCompleted?.Invoke();
+                    break;
+                case AnimationStyles.ANIMATOR:
+                    HandleAnimator(p_show, p_onCompleted, p_ratio);
+                    break;
+                case AnimationStyles.TWEEN:
+                    HandleTween(p_show, p_onCompleted);
+                    break;
             }
         }
 
-        return 0;
-    }
-    #endregion
+        protected virtual void HandleEvents(bool subscribe) { }
 
-    #region Tween
-    protected virtual void HandleTween(bool p_show, System.Action p_onCompleted)
-    {
-        if (p_show) TweenInAnimation(p_onCompleted); else TweenOutAnimation(p_onCompleted);
-    }
-    /// <summary>
-    /// Override this to write the animation that will be executed when ShowDisplay is called.
-    /// base will call the onCompleted callback, be careful to not end up calling it twiece.
-    /// </summary>
-    protected async virtual void TweenInAnimation(System.Action p_onCompleted) { await Task.Yield(); p_onCompleted?.Invoke(); }
-    /// <summary>
-    /// Override this to write the animation that will be executed when HideDisplay is called.
-    /// base will call the onCompleted callback, be careful to not end up calling it twiece.
-    /// </summary>
-    protected async virtual void TweenOutAnimation(System.Action p_onCompleted) { await Task.Yield(); p_onCompleted?.Invoke(); }
-    #endregion
-
-    #region Inputs
-
-    #region Start InputListeners / Assing Input Callbacks
-    /// <summary>
-    /// The current Display wwill start receiving input from all players.
-    /// </summary>
-    protected virtual void StartInputListeners() => InputManager.InputListeners.ForEach(listener => StartInputListener(listener));
-    protected virtual void StopInputListeners() => InputManager.InputListeners.ForEach(listener => StopInputListener(listener));
-    /// <summary>
-    /// The current Display wwill start receiving input from the players with the p_id (the player listner id is it's position on the _inputListeners List at InputManager).
-    /// </summary>
-    protected virtual void StartInputListener(int p_id) => StartInputListener(InputManager.GetInputListener(p_id));
-    protected virtual void StopInputListener(int p_id) => StopInputListener(InputManager.GetInputListener(p_id));
-
-    /// <summary>
-    /// Subscribes to all UI input events from p_listener
-    /// </summary>
-    protected virtual void StartInputListener(InputListener p_listener)
-    {
-        InputListener _inputListner = p_listener;
-        
-        if(_useWhileActiveInput) _inputListner.UI.onWhileMovementActive += UI_onWhileMovementActive;
-        _inputListner.UI.onWhileMovementActiveDelayed += UI_onWhileMovementActiveDelayed;
-        _inputListner.UI.onConfirmRequested += UI_onConfirmRequested;
-        _inputListner.UI.onCancelRequested += UI_InputHandler_onCancelRequested;
-    }
-
-    protected virtual void StopInputListener(InputListener p_listener)
-    {
-        InputListener _inputListner = p_listener;
-
-        _inputListner.UI.onWhileMovementActive -= UI_onWhileMovementActive;
-        _inputListner.UI.onWhileMovementActiveDelayed -= UI_onWhileMovementActiveDelayed;
-        _inputListner.UI.onConfirmRequested -= UI_onConfirmRequested;
-        _inputListner.UI.onCancelRequested -= UI_InputHandler_onCancelRequested;
-    }
-    #endregion
-
-    #region Input Callbacks
-    /// <summary>
-    /// It runs on a update so while the input is != then 0 this will be running. (use when constant update is required)
-    /// </summary>
-    protected virtual void UI_onWhileMovementActive(int p_id, Vector2 p_dir) => HandleMovement(false, p_id, p_dir);
-    /// <summary>
-    ///  It runs on a update while the input is != then 0, but has a delay in between calls default delay is 0.25s.
-    /// </summary>
-    protected virtual void UI_onWhileMovementActiveDelayed(int p_id, Vector2 p_dir) => HandleMovement(true, p_id, p_dir);
-    protected virtual void UI_onConfirmRequested(int p_id) { }
-    protected virtual void UI_InputHandler_onCancelRequested(int p_id) { }
-    #endregion
-
-    #region Callback Handlers
-    protected virtual void HandleMovement(bool p_delayed, int p_id, Vector2 p_dir)
-    {
-        if (Mathf.Abs(p_dir.x) > 0.1f)
+        #region Animator
+        private void HandleAnimator(bool p_show, System.Action p_callback, float p_ratio)
         {
-            int __direction = p_dir.x > 0 ? 1 : -1;
-            if (p_delayed) HandleHorizontalMovementDelayed(p_id, __direction); else HandleHorizontalMovementActive(p_id, __direction);
+            string __animation = p_show ? "In" : "Out";
 
+            if (TryGetComponent(out Animator __animator))
+            {
+                __animator.SetTrigger(__animation);
+
+                if (p_callback != null) StartCoroutine(RoutineShow(__animation, p_callback, p_ratio));
+            }
+            else
+            {
+                Debug.LogError("Requested animator animation style but animator could not be found.");
+            }
         }
-        else if (Mathf.Abs(p_dir.y) > 0.1f)
+
+        private IEnumerator RoutineShow(string p_animation, System.Action p_callback, float p_ratio)
         {
-            int __direction = p_dir.y > 0 ? 1 : -1;
+            float __delay = GetClipLength(p_animation) * GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).speed * p_ratio;
 
-            if (p_delayed) HandleVerticalMovementDelayed(p_id, __direction); else HandleVerticalMovementActive(p_id, __direction);
+            yield return new WaitForSecondsRealtime(__delay);
+
+            p_callback?.Invoke();
         }
+
+        private float GetClipLength(string name)
+        {
+            AnimationClip[] clips = GetComponent<Animator>().runtimeAnimatorController.animationClips;
+            foreach (var item in clips)
+            {
+                if (item.name == name)
+                {
+                    return item.length;
+                }
+            }
+
+            return 0;
+        }
+        #endregion
+
+        #region Tween
+        protected virtual void HandleTween(bool p_show, System.Action p_onCompleted)
+        {
+            if (p_show) TweenInAnimation(p_onCompleted); else TweenOutAnimation(p_onCompleted);
+        }
+        /// <summary>
+        /// Override this to write the animation that will be executed when ShowDisplay is called.
+        /// base will call the onCompleted callback, be careful to not end up calling it twiece.
+        /// </summary>
+        protected virtual void TweenInAnimation(System.Action p_onCompleted) { p_onCompleted?.Invoke(); }
+        /// <summary>
+        /// Override this to write the animation that will be executed when HideDisplay is called.
+        /// base will call the onCompleted callback, be careful to not end up calling it twiece.
+        /// </summary>
+        protected virtual void TweenOutAnimation(System.Action p_onCompleted) { p_onCompleted?.Invoke(); }
+        #endregion
     }
-    //It uses the Editor Navigation to define the order in which the elemets will be selected when an input is made, assing it on the editor for each UIOption.
-    //All UI Selectables must be an UIOption or derive from it.
-    protected virtual void HandleHorizontalMovementActive(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
-    protected virtual void HandleHorizontalMovementDelayed(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnRight as UIOption : _curSelected.navigation.selectOnLeft as UIOption);
-    protected virtual void HandleVerticalMovementActive(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
-    protected virtual void HandleVerticalMovementDelayed(int p_id, int p_direction) => SelectOption(p_direction > 0 ? _curSelected.navigation.selectOnUp as UIOption : _curSelected.navigation.selectOnDown as UIOption);
-    public virtual void SelectOption(UIOption p_option)
-    {
-        if (p_option == null)
-            return;
-
-        _curSelected = p_option;
-        _curSelected.Select();
-    }
-    #endregion
-
-    #endregion
-
-    public virtual void UpdateDisplay(int p_operation, bool p_value) { }
-    public virtual void UpdateDisplay(int p_operation, float p_value, float p_data) { }
-    public virtual void UpdateDisplay(int p_operation, float[] p_data){ }
-    public virtual void UpdateDisplay(int p_operation, object p_data) { }
-
-    public virtual object GetData(int p_data) { return null; }
-
-    public virtual void RequestAction(int p_action) => RequestAction(p_action, p_action == 0 ? _backTo : null);
-    public virtual void RequestAction(int p_action, object p_data) => onActionRequested?.Invoke(ID, p_action, p_data);
 }

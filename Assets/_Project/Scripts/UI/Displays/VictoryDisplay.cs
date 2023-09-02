@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VictoryDisplay : Display
+namespace ETemplate.UI
 {
+    public class VictoryDisplay : Display
+    {
 
+    }
 }

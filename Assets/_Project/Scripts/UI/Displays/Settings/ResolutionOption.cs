@@ -1,50 +1,59 @@
 using UnityEngine;
-using System.Linq;
-using UnityEngine.EventSystems;
 
-public class ResolutionOption : SettingOption
+namespace ETemplate.UI
 {
-    private Resolution[] _availableResolutions;
-    private Resolution _choosenResolution, _backToResolution;
-
-    protected override void Awake()
+    public class ResolutionOption : SettingOption
     {
-        base.Awake();
+        [SerializeField] private UIButton _leftButton, _rightButton;
 
-        _availableResolutions = Screen.resolutions;
-    }
+        private Resolution[] _availableResolutions;
+        private Resolution _choosenResolution, _backToResolution;
 
-    public override void UpdateCurrentValues()
-    {
-        base.UpdateCurrentValues();
+        public override void Initiate()
+        {
+            base.Initiate();
+            _availableResolutions = Screen.resolutions;
+        }
 
-        _index = System.Array.IndexOf(_availableResolutions, Screen.currentResolution);
-        _backToResolution = Screen.currentResolution;
-        UpdateChoosenResolution(Screen.currentResolution);
-    }
+        public override void UpdateCurrentValues()
+        {
+            base.UpdateCurrentValues();
 
-    public override void UpdateOptionActiveDelayed(int p_direction)
-    {
-        _index = HelpExtensions.ClampCircle(_index + p_direction, 0, _availableResolutions.Length - 1);
+            _index = System.Array.IndexOf(_availableResolutions, Screen.currentResolution);
+            _backToResolution = Screen.currentResolution;
+            UpdateChoosenResolution(Screen.currentResolution);
+        }
 
-        UpdateChoosenResolution(_availableResolutions[_index]);
-    }
+        public override void UpdateOptionActiveDelayed(int p_direction)
+        {
+            _index = HelpExtensions.ClampCircle(_index + p_direction, 0, _availableResolutions.Length - 1);
 
-    public override void Apply()
-    {
-        base.Apply();
-        Screen.SetResolution(_choosenResolution.width, _choosenResolution.height, WindowOption.FullScreenMode);
-    }
+            UpdateChoosenResolution(_availableResolutions[_index]);
+        }
 
-    public override void Cancel()
-    {
-        base.Cancel();
-        UpdateChoosenResolution(_backToResolution);
-    }
+        public override void Apply()
+        {
+            base.Apply();
+            Screen.SetResolution(_choosenResolution.width, _choosenResolution.height, WindowOption.FullScreenMode);
+        }
 
-    private void UpdateChoosenResolution(Resolution p_choosen)
-    {
-        _choosenResolution = p_choosen;
-        _valueText.text = p_choosen.width + "x" + p_choosen.height;
+        public override void Cancel()
+        {
+            base.Cancel();
+            UpdateChoosenResolution(_backToResolution);
+        }
+
+        private void UpdateChoosenResolution(Resolution p_choosen)
+        {
+            _choosenResolution = p_choosen;
+            _valueText.text = p_choosen.width + "x" + p_choosen.height;
+        }
+
+        protected override void HandleSubscribeToEvents(bool p_subscribe)
+        {
+            _leftButton.onPointerClick.HandleSubscribe(() => UpdateOptionActiveDelayed(-1), p_subscribe);
+            _rightButton.onPointerClick.HandleSubscribe(() => UpdateOptionActiveDelayed(1), p_subscribe);
+            base.HandleSubscribeToEvents(p_subscribe);
+        }
     }
 }

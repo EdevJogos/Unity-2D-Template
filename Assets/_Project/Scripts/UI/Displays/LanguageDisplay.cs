@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public class LanguageDisplay : Display
+namespace ETemplate.UI
 {
+    public class LanguageDisplay : Display
+    {
 
+    }
 }

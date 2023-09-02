@@ -2,7 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoadingDisplay : Display
+namespace ETemplate.UI
 {
+    public class LoadingDisplay : Display
+    {
 
+    }
 }

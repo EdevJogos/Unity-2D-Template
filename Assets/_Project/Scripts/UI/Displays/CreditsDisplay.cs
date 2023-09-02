@@ -1,7 +1,9 @@
-using System;
 using UnityEngine;
 
-public class CreditsDisplay : Display
+namespace ETemplate.UI
 {
+    public class CreditsDisplay : Display
+    {
 
+    }
 }

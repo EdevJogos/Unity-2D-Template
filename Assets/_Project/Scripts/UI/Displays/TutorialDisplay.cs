@@ -1,7 +1,10 @@
 using System;
 using UnityEngine;
 
-public class TutorialDisplay : Display
+namespace ETemplate.UI
 {
+    public class TutorialDisplay : Display
+    {
 
+    }
 }

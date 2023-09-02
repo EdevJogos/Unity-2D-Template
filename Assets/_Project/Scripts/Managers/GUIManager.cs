@@ -1,140 +1,98 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
+using ETemplate.UI;
+using UnityEngine.Events;
 
-public class GUIManager : Manager
+namespace ETemplate.Manager
 {
-    private struct DisplayAction
+    [Serializable]
+    public class GUIManager : Manager
     {
-        public int actionID;
-        public Action<object> action;
+        public event Action onIntroDisplayRequested;
+        public event Action onCreditsDisplayRequested;
+        public event Action onSettingsDisplayRequested;
 
-        public DisplayAction(int p_id, Action<object> p_action)
+        [SerializeField] private Transform _displaysHolder;
+
+        private UI.Display _activeDisplay;
+        private Dictionary<Displays, UI.Display> _displays = new Dictionary<Displays, UI.Display>();
+
+        public override void Initiate()
         {
-            actionID = p_id;
-            action = p_action;
-        }
-    }
-
-    public event Action<object> onLobbyRequested;
-    public event Action<object> onJoinRequested;
-    public event Action<object> onSwitchCharacterRequested;
-    public event Action<object> onAllPlayersReady;
-
-    [SerializeField] private Transform _displaysHolder;
-
-    private Display _activeDisplay;
-    private Dictionary<Displays, Display> _displays = new Dictionary<Displays, Display>();
-    private Dictionary<Displays, List<DisplayAction>> _displayActions = new Dictionary<Displays, List<DisplayAction>>();
-
-    public override void Initiate()
-    {
-        Display.onActionRequested += OnActionRequested;
-
-        foreach (Transform __transform in _displaysHolder)
-        {
-            Display __display = __transform.GetComponent<Display>();
-
-            if (__display == null)
-                return;
-
-            __display.Initiate();
-            _displays.Add(__display.ID, __display);
-            _displayActions.Add(__display.ID, new List<DisplayAction>());
-        }
-    }
-
-    private void OnDestroy()
-    {
-        Display.onActionRequested -= OnActionRequested;
-    }
-
-    public override void Initialize()
-    {
-        foreach (Display __display in _displays.Values)
-        {
-            __display.Initialize();
-        }
-
-        _displayActions[Displays.INTRO].Add(new DisplayAction(Display.BACK, (p_data) => { Application.Quit(); }));
-        _displayActions[Displays.INTRO].Add(new DisplayAction(1, onLobbyRequested));
-        _displayActions[Displays.INTRO].Add(new DisplayAction(2, (p_data) => { ShowDisplay(Displays.SETTINGS); }));
-        _displayActions[Displays.INTRO].Add(new DisplayAction(3, (p_data) => { ShowDisplay(Displays.CREDITS); }));
-
-        _displayActions[Displays.SETTINGS].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
-
-        _displayActions[Displays.CREDITS].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
-
-        _displayActions[Displays.LOBBY].Add(new DisplayAction(Display.BACK, (p_data) => { ShowDisplay((Displays)p_data); }));
-        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.JOIN, onJoinRequested));
-        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.SWITCH_CHARACTER, onSwitchCharacterRequested));
-        _displayActions[Displays.LOBBY].Add(new DisplayAction(LobbyDisplay.ALL_PLAYERS_READY, onAllPlayersReady));
-    }
-
-    public override void Restart()
-    {
-        
-    }
-
-    public void ShowDisplay(Displays p_display, Action p_onShowCompleted = null, float p_hideRatio = 1f, float p_showRatio = 1f)
-    {
-        if (_activeDisplay == null || (_activeDisplay != null && _activeDisplay.ID != p_display))
-        {
-            if (_activeDisplay != null)
+            foreach (Transform __transform in _displaysHolder)
             {
-                _activeDisplay.Show(false, () => { ActiveDisplay(p_display, p_onShowCompleted, p_showRatio); }, p_hideRatio);
-            }
-            else
-            {
-                ActiveDisplay(p_display, p_onShowCompleted, p_showRatio);
+                if(__transform.TryGetComponent(out UI.Display __display))
+                {
+                    __display.Initiate();
+                    _displays.Add(__display.ID, __display);
+                }
             }
         }
-    }
 
-    private void ActiveDisplay(Displays p_display, Action p_onShowCompleted, float p_showRatio)
-    {
-        _activeDisplay = _displays[p_display];
-        _activeDisplay.Show(true, p_onShowCompleted, p_showRatio);
-    }
-
-    #region Update Display Calls
-
-    public void UpdateDisplay(Displays p_id, int p_operation, bool p_value)
-    {
-        _displays[p_id].UpdateDisplay(p_operation, p_value);
-    }
-
-    public void UpdateDisplay(Displays p_id, int p_operation, float p_value = -99999, float p_data = -99999)
-    {
-        _displays[p_id].UpdateDisplay(p_operation, p_value, p_data);
-    }
-
-    public void UpdateDisplay(Displays p_id, int p_operation, int[] p_data)
-    {
-        _displays[p_id].UpdateDisplay(p_operation, p_data);
-    }
-
-    public void UpdateDisplay(Displays p_id, int p_operation, object p_data)
-    {
-        _displays[p_id].UpdateDisplay(p_operation, p_data);
-    }
-
-    #endregion
-
-    public object GetData(Displays p_id, int p_data)
-    {
-        return _displays[p_id].GetData(p_data);
-    }
-
-    private void OnActionRequested(Displays p_id, int p_actionID, object p_data)
-    {
-        List<DisplayAction> __actionsList = _displayActions[p_id];
-        int __index = __actionsList.FindIndex(0, __actionsList.Count, (displayAction) => displayAction.actionID == p_actionID);
-
-        if(__index >= 0)
+        public override void Initialize()
         {
-            __actionsList[__index].action?.Invoke(p_data);
+            HandleDisplayEvents(true);
+
+            foreach (UI.Display __display in _displays.Values)
+            {
+                __display.Initialize();
+            }
         }
-    }
+
+        private void OnDestroy()
+        {
+            HandleDisplayEvents(false);
+        }
+
+        public void ShowDisplay(Displays p_id, Action p_onShowCompleted = null, float p_hideRatio = 1f, float p_showRatio = 1f)
+        {
+            if (_activeDisplay == null || (_activeDisplay != null && _activeDisplay.ID != p_id))
+            {
+                if (_activeDisplay != null)
+                {
+                    _activeDisplay.Show(false, () => { ActiveDisplay(p_id, p_onShowCompleted, p_showRatio); }, p_hideRatio);
+                }
+                else
+                {
+                    ActiveDisplay(p_id, p_onShowCompleted, p_showRatio);
+                }
+            }
+        }
+
+        public UI.Display GetDisplay(Displays p_id)
+        {
+            return _displays[p_id];
+        }
+
+        public T GetDisplay<T>(Displays p_id) where T : class
+        {
+            return GetDisplay(p_id).GetComponent<T>();
+        }
+
+        private void RequestDisplay(Displays p_id)
+        {
+            switch (p_id)
+            {
+                case Displays.INTRO: onIntroDisplayRequested?.Invoke(); break;
+                case Displays.CREDITS: onCreditsDisplayRequested?.Invoke(); break;
+                case Displays.SETTINGS: onSettingsDisplayRequested?.Invoke(); break;
+            }
+        }
+
+        private void HandleDisplayEvents(bool p_subscribe)
+        {
+            foreach (UI.Display __display in _displays.Values)
+            {
+                __display.Navigation?.OnDisplayRequested.HandleSubscribe(RequestDisplay, p_subscribe);
+                __display.Navigation?.OnBackRequested.HandleSubscribe(RequestDisplay, p_subscribe);
+            }
+        }
+
+        private void ActiveDisplay(Displays p_display, Action p_onShowCompleted, float p_showRatio)
+        {
+            _activeDisplay = _displays[p_display];
+            _activeDisplay.Show(true, p_onShowCompleted, p_showRatio);
+        }
+    } 
 }

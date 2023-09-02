@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public static class HelpExtensions
 {
@@ -167,5 +168,31 @@ public static class HelpExtensions
     public static float GetStereoPan(float p_x)
     {
         return (p_x / 12.5f) * 0.5f;
+    }
+
+    public static void HandleSubscribe(this UnityEvent p_event, UnityAction p_aciton, bool subscribe)
+    {
+        if (subscribe) p_event.AddListener(p_aciton);
+        else p_event.RemoveListener(p_aciton);
+    }
+    public static void HandleSubscribe<T0>(this UnityEvent<T0> p_event, UnityAction<T0> p_aciton, bool subscribe)
+    {
+        if (subscribe) p_event.AddListener(p_aciton);
+        else p_event.RemoveListener(p_aciton);
+    }
+    public static void HandleSubscribe<T0, T1>(this UnityEvent<T0, T1> p_event, UnityAction<T0, T1> p_aciton, bool subscribe)
+    {
+        if (subscribe) p_event.AddListener(p_aciton);
+        else p_event.RemoveListener(p_aciton);
+    }
+    public static void HandleSubscribe<T0, T1, T2>(this UnityEvent<T0, T1, T2> p_event, UnityAction<T0, T1, T2> p_aciton, bool subscribe)
+    {
+        if (subscribe) p_event.AddListener(p_aciton);
+        else p_event.RemoveListener(p_aciton);
+    }
+    public static void HandleSubscribe<T0, T1, T2, T3>(this UnityEvent<T0, T1, T2, T3> p_event, UnityAction<T0, T1, T2, T3> p_aciton, bool subscribe)
+    {
+        if (subscribe) p_event.AddListener(p_aciton);
+        else p_event.RemoveListener(p_aciton);
     }
 }

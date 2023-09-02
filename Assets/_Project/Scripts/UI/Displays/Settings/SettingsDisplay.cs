@@ -1,74 +1,94 @@
+using ETemplate.Manager;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SettingsDisplay : Display
+namespace ETemplate.UI
 {
-    public Transform selection;
-    public GridLayoutGroup optionsGrid;
-
-    private List<SettingOption> _options = new List<SettingOption>();
-
-    private SettingOption SelectedOption => _curSelected as SettingOption;
-
-    public override void Initialize()
+    public class SettingsDisplay : Display
     {
-        foreach (Transform __transform in optionsGrid.transform)
+        public Image imageSelection;
+        public GridLayoutGroup optionsGrid;
+
+        private List<SettingOption> _options = new List<SettingOption>();
+
+        private SettingOption SelectedOption => Navigation.CurSelected as SettingOption;
+
+        public override void Initiate()
         {
-            if (__transform.TryGetComponent(out SettingOption __settingOption))
+            foreach (Transform __transform in optionsGrid.transform)
             {
-                __settingOption.onSelected += () => 
+                if (__transform.TryGetComponent(out SettingOption __settingOption))
                 {
-                    selection.position = __settingOption.Position;
-                };
-
-                __settingOption.Initiate();
-
-                _options.Add(__settingOption);
+                    __settingOption.Initiate();
+                    _options.Add(__settingOption);
+                }
             }
+
+            base.Initiate();
         }
 
-        LayoutRebuilder.ForceRebuildLayoutImmediate(optionsGrid.GetComponent<RectTransform>());
+        public override void Initialize()
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(optionsGrid.GetComponent<RectTransform>());
+            base.Initialize();
+        }
 
-        base.Initialize();
-    }
+        public override void Show(bool p_show, Action p_callback, float p_ratio)
+        {
+            if (p_show)
+            {
+                for (int __i = 0; __i < _options.Count; __i++)
+                {
+                    _options[__i].UpdateCurrentValues();
+                }
 
-    public override void Show(bool p_show, Action p_callback, float p_ratio)
-    {
-        if (p_show)
+                imageSelection.enabled = true;
+
+                InputManager.UIMainListener.onHoldingMovement += UIMainListener_onHoldingMovement;
+            }
+            else
+            {
+                InputManager.UIMainListener.onHoldingMovement -= UIMainListener_onHoldingMovement;
+                PlayerPrefs.Save();
+            }
+
+            Navigation.OnSelected.HandleSubscribe(HandleOnSelected, p_show);
+            Navigation.OnHorizontalNavigation.HandleSubscribe(HandleHorizontalNavigation, p_show);
+
+            base.Show(p_show, p_callback, p_ratio);
+        }
+
+        public void ApplySettings()
         {
             for (int __i = 0; __i < _options.Count; __i++)
             {
-                _options[__i].UpdateCurrentValues();
+                _options[__i].Apply();
             }
-
-            selection.GetComponent<Image>().enabled = true;
         }
-        else
+
+        public void HandleOnSelected(Selectable p_selectable)
         {
-            PlayerPrefs.Save();
+            //Moves the selection bar to the current selected button.
+            if (p_selectable is SettingOption)
+            {
+                imageSelection.enabled = true;
+                imageSelection.transform.position = p_selectable.transform.position;
+            }
+            else imageSelection.enabled = false;
         }
 
-        base.Show(p_show, p_callback, p_ratio);
-    }
-
-    public void ApplySettings()
-    {
-        for (int __i = 0; __i < _options.Count; __i++)
+        //Calls UpdateOptionActiveDelayed to update the selection options like (Resolution and Window mode).
+        public void HandleHorizontalNavigation(int p_dir) => SelectedOption.UpdateOptionActiveDelayed(p_dir);
+        //Uses onHoldingMovement to call UpdateOptionActive and update the volume sliders since they need to move x amount every frame.
+        private void UIMainListener_onHoldingMovement(int p_id, Vector2 p_input)
         {
-            _options[__i].Apply();
+            if (Mathf.Abs(p_input.x) > 0.1f)
+            {
+                int __dir = p_input.x > 0 ? 1 : -1;
+                SelectedOption.UpdateOptionActive(__dir);
+            }
         }
     }
-
-    public override void SelectOption(UIOption p_option)
-    {
-        selection.GetComponent<Image>().enabled = p_option is SettingOption or ButtonControl;
-        base.SelectOption(p_option);
-    }
-
-    protected override void HandleHorizontalMovementActive(int p_id, int p_dir) => SelectedOption.UpdateOptionActive(p_dir);
-    protected override void HandleHorizontalMovementDelayed(int p_id, int p_dir) => SelectedOption.UpdateOptionActiveDelayed(p_dir);
-    protected override void HandleVerticalMovementActive(int p_id, int p_dir) { }
-    protected override void UI_InputHandler_onCancelRequested(int p_id) => RequestAction(BACK, _backTo);
 }

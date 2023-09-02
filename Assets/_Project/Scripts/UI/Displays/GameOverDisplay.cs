@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public class GameOverDisplay : Display
+namespace ETemplate.UI
 {
+    public class GameOverDisplay : Display
+    {
 
+    }
 }
